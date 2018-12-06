@@ -14,13 +14,13 @@
 
   - setup: # aka gather_facts
     tags: always # required for tags, see ansible issue: #14228
-    
+
   - name: test min. vars (group_vars/all) are set (ClusterConfiguration and k8s_network_addons_urls)
     debug: msg='Make sure min. vars are set in group_vars/all/ (e.g. ClusterConfiguration and k8s_network_addons_urls)'
-    when: 
+    when:
     - ClusterConfiguration is not defined
     - JoinConfiguration is not defined
-    failed_when: 
+    failed_when:
     - ClusterConfiguration is not defined
     - JoinConfiguration is not defined
     tags: always # always check if we have vars in place
@@ -60,7 +60,7 @@
   - { role: tools, task: reset, tags: [ 'reset', 'etcd_reset' ], when: "inventory_hostname not in groups['masters']" }
   - { role: tools, task: weave_reset, tags: [ 'reset', 'etcd_reset', 'network_reset', 'weave_reset', 'weave' ], when: "inventory_hostname not in groups['masters']" }
   - { role: common, task: all, tags: [ 'common', 'install', 'common_install', 'etcd_install', 'node' ], when: "inventory_hostname not in groups['masters']" }
-    
+
 ## master -> reset and install common part (for all masters - and sometimes etcd when colocated with masters)
 - hosts: masters
   become: yes
@@ -83,7 +83,7 @@
   - etcd_install
   - ha
   roles:
-  - { role: etcd, tags: [ 'install', 'etcd_install', 'ha', 'etcd'], when: "groups['masters'] | length > 1" } 
+  - { role: etcd, tags: [ 'install', 'etcd_install', 'ha', 'etcd'], when: "groups['masters'] | length > 1" }
 
 ## master -> install keepalived and deploy etcd client certs on masters (relevat if HA)
 - hosts: masters
@@ -99,7 +99,7 @@
   - { role: keepalived, tags: [ 'master', 'install', 'master_install', 'ha', 'keepalived'], when: "groups['masters'] | length > 1" }
   - { role: client-certs, tags: [ 'master', 'install', 'master_install', 'ha', 'client-certs'], when: "groups['masters'] | length > 1" }
 
-- hosts: primary-master 
+- hosts: primary-master
   name: primary-master (or master in general) - it applies to both ha and non-ha
   become: yes
   become_method: sudo
@@ -110,7 +110,7 @@
   - master_install
   - ha
   roles:
-  - { role: master, tags: [ 'primary-master', 'master', 'install', 'master_install'] } 
+  - { role: master, tags: [ 'primary-master', 'master', 'install', 'master_install'] }
 
 - hosts: secondary-masters
   become: yes
@@ -122,7 +122,7 @@
   - ha
   - master_install
   roles:
-  - { role: master, tags: [ 'secondary-masters', 'master', 'install', 'master_install', 'secondary_masters'] } 
+  - { role: master, tags: [ 'secondary-masters', 'master', 'install', 'master_install', 'secondary_masters'] }
 
 ## node -> install nodes (kubeadm join, etc)
 - hosts: nodes
@@ -185,3 +185,250 @@
 
 ## To get cluster info/sanity:
 ## ansible-playbook -i hosts -v site.yml --tags "cluster_sanity,cluster_info"
+
+
+
+# -----------------------------------------------------------------------
+
+
+##############################################################################
+# Install prereqs for perf/tools
+##############################################################################
+# # no_log: true
+- hosts: servers
+  gather_facts: True
+  become: yes
+  become_method: sudo
+  tags:
+    - prereqs
+    - perf
+    - perf_tools
+    - tools
+    - servers
+  pre_tasks:
+  - name: "Install prereq tools"
+    package:
+      name: "{{ item }}"
+      state: present
+    with_items:
+        - nethogs
+        - ccze
+        - htop
+        - silversearcher-ag
+        - netcat
+        - nmap
+        - netperf
+        - ngrep
+        - unzip
+        - nload
+        - ncdu
+        - traceroute
+        - sysstat
+        - conntrack
+        # NOTE: RUN THIS GUY
+        - mtr
+        - tmux
+        # SOURCE: https://www.tecmint.com/test-network-throughput-in-linux/
+        - iperf3
+        # SOURCE: https://www.tecmint.com/tcpflow-analyze-debug-network-traffic-in-linux/
+        - tcpflow
+        # SOURCE: https://www.tecmint.com/linux-network-bandwidth-monitoring-tools/
+        - iftop
+
+  # SOURCE: https://gist.github.com/kometchtech/c5681b2a70b30c99bf7e834ffb3abba5
+  - name: "Install dnsperf prereqs"
+    package:
+      name: "{{ item }}"
+      state: present
+    with_items:
+        - bind9utils
+        - libbind-dev
+        - libkrb5-dev
+        - libssl-dev
+        - libcap-dev
+        - libxml2-dev
+        - geoip-bin
+        - libgeoip-dev
+        - build-essential
+        - curl
+        # REQUIRED: https://www.tecmint.com/hegemon-system-monitoring-tool-for-linux/
+        - libsensors4-dev
+
+  - name: check if /usr/bin/sysdig exists
+    stat:
+      path: /usr/bin/sysdig
+    register: sysdig_result
+    failed_when: false
+    changed_when: false
+    tags:
+      - slow
+
+  - name: "SYSDIG: curl -s https://s3.amazonaws.com/download.draios.com/stable/install-sysdig | sudo bash ONLY if it is not installed already"
+    shell: |
+      bash -lc "curl -s https://s3.amazonaws.com/download.draios.com/stable/install-sysdig | sudo bash"
+    args:
+      executable: /bin/bash
+    when: not sysdig_result.stat.exists
+    tags:
+      - slow
+
+  - name: check if /usr/local/bin/cargo exists
+    stat:
+      path: /usr/local/bin/cargo
+    register: cargo_result
+    failed_when: false
+    changed_when: false
+    tags:
+      - slow
+
+  - name: "RUST: curl -sSf https://static.rust-lang.org/rustup.sh | sh ONLY if it is not installed already"
+    shell: |
+      bash -lc "curl -sSf https://static.rust-lang.org/rustup.sh | sh"
+    args:
+      executable: /bin/bash
+    when: not cargo_result.stat.exists
+    tags:
+      - slow
+
+  - name: install ctop
+    shell: |
+      curl -L 'https://github.com/bcicen/ctop/releases/download/v0.7.1/ctop-0.7.1-linux-amd64' > /usr/local/bin/ctop
+      chmod +x /usr/local/bin/ctop
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/ctop
+
+    # https://github.com/wercker/stern/releases/download/1.10.0/stern_linux_amd64
+
+    # https://github.com/bcicen/ctop/releases/download/v0.7.1/ctop-0.7.1-linux-amd64
+
+  # NOTE: Multi pod and container log tailing for Kubernetes
+  - name: install stern
+    shell: |
+      curl -L 'https://github.com/wercker/stern/releases/download/1.10.0/stern_linux_amd64' > /usr/local/bin/stern
+      chmod +x /usr/local/bin/stern
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/stern
+
+  - name: Add source <(stern --completion=bash) to root/ssh user bashrc
+    lineinfile:
+      path: '$HOME/.bashrc'
+      line: 'source <(stern --completion=bash)'
+      create: yes
+    become: '{{ item }}'
+    with_items:
+      - true  # Run as root
+      - false # Run as SSH user
+
+  # An interactive kubernetes client featuring auto-complete using go-prompt.
+  - name: install kube-prompt
+    shell: |
+      wget https://github.com/c-bata/kube-prompt/releases/download/v1.0.5/kube-prompt_v1.0.5_linux_amd64.zip
+      unzip kube-prompt_v1.0.5_linux_amd64.zip
+      chmod +x kube-prompt
+      sudo mv ./kube-prompt /usr/local/bin/kube-prompt
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/kube-prompt
+
+  # Simplistic interactive filtering tool
+  - name: install peco
+    shell: |
+      wget https://github.com/peco/peco/releases/download/v0.5.3/peco_linux_amd64.tar.gz ;
+      tar xvf peco_linux_amd64.tar.gz ;
+      mv peco_linux_amd64/peco /usr/local/bin/peco ;
+      chmod +x /usr/local/bin/peco ;
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/peco
+
+  # https://github.com/pulumi/kubespy/releases/download/v0.4.0/kubespy-linux-amd64.tar.gz
+
+  # kubespy - Tools for observing Kubernetes resources in real time, powered by Pulumi
+  - name: install kubespy - Tools for observing Kubernetes resources in real time, powered by Pulumi
+    shell: |
+      wget https://github.com/pulumi/kubespy/releases/download/v0.4.0/kubespy-linux-amd64.tar.gz ;
+      tar xvf kubespy-linux-amd64.tar.gz ;
+      mv releases/kubespy-linux-amd64/kubespy /usr/local/bin/kubespy ;
+      chmod +x /usr/local/bin/kubespy ;
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/kubespy
+
+  # kubetail
+  - name: install kubetail
+    shell: |
+      curl -L 'https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail' > /usr/local/bin/kubetail ;
+      chmod +x /usr/local/bin/kubetail ;
+      curl -L 'https://raw.githubusercontent.com/johanhaleby/kubetail/master/completion/kubetail.bash' > /etc/bash_completion.d/kubetail ;
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/kubetail
+
+  # https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail
+
+  # https://github.com/peco/peco/releases/download/v0.5.3/peco_linux_amd64.tar.gz
+
+  - name: Install kube-shell
+    pip:
+      name: "kube-shell"
+
+  # NOTE: fast way to switch between clusters and namespaces in kubectl
+  - name: install kubectx - fast way to switch between clusters and namespaces in kubectl
+    shell: |
+      curl -L 'https://raw.githubusercontent.com/ahmetb/kubectx/master/kubectx' > /usr/local/bin/kubectx
+      chmod +x /usr/local/bin/kubectx
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/kubectx
+
+  - name: install kubebox - Terminal and Web console for Kubernetes
+    shell: |
+      curl -L 'https://github.com/astefanutti/kubebox/releases/download/v0.3.2/kubebox-linux' > /usr/local/bin/kubebox
+      chmod +x /usr/local/bin/kubebox
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/kubebox
+
+  # kubectl create clusterrolebinding default-cluster-admin --clusterrole=cluster-admin --serviceaccount=default:default
+
+
+  # curl -Lo kubebox https://github.com/astefanutti/kubebox/releases/download/v0.3.2/kubebox-linux && chmod +x kubebox
+
+  # NOTE: fast way to switch between clusters and namespaces in kubectl
+  - name: install kubens - fast way to switch between clusters and namespaces in kubectl
+    shell: |
+      curl -L 'https://raw.githubusercontent.com/ahmetb/kubectx/master/kubens' > /usr/local/bin/kubens
+      chmod +x /usr/local/bin/kubens
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/kubens
+
+
+  ##############################################################################
+  # Install osquery
+  ##############################################################################
+  # $ export OSQUERY_KEY=1484120AC4E9F8A1A577AEEE97A80C63C9D8B80B
+  # $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $OSQUERY_KEY
+  # $ sudo add-apt-repository 'deb [arch=amd64] https://pkg.osquery.io/deb deb main'
+  # $ sudo apt update
+  # $ sudo apt install osquery

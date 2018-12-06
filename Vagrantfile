@@ -62,8 +62,8 @@ Vagrant.configure(2) do |config|
 
   config.vm.provider 'virtualbox' do |vb|
     vb.gui = false # Set to true to view the window in graphical mode
-    vb.memory = '2048' # "4096" #"3072" # 6144
-    vb.cpus = 2
+    vb.memory = '4096' # "4096" #"3072" # 6144
+    vb.cpus = 4
     # vb.customize ["storagectl", :id, "--name", "IDE Controller", "--remove"] # Make sure it does not use IDE
     # vb.customize ["storagectl", :id, "--name", "SATA Controller", "--add", "sata"]   # Make it use SATA: faster and less issues
     # optionally add: , "--hostiocache", "on", "--bootable", "on"] # like here: https://www.virtualbox.org/manual/ch08.html#vboxmanage-storagectl
