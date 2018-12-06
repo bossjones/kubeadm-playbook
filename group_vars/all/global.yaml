@@ -6,7 +6,7 @@
 #proxy_env:
 #  http_proxy: 'http://proxy.corp.example.com:8080'
 #  https_proxy: 'http://proxy.corp.example.com:8080'
-#  no_proxy: '127.0.0.1,localhost,.example.com,.svc,.local,/var/run/docker.sock,.sock,sock' 
+#  no_proxy: '127.0.0.1,localhost,.example.com,.svc,.local,/var/run/docker.sock,.sock,sock'
 #####
 
 KUBERNETES_VERSION: "1.12.1"
@@ -43,7 +43,7 @@ CERT_ORG_UNIT: "ORG"
 
 ########## Image pre-pull on MASTERS (only)
 # Usually pre-pull not required, but there is this option here.
-# Depending on what images you plan to use during deployment, you 
+# Depending on what images you plan to use during deployment, you
 #####
 pre_pull_k8s_images: True
 #####
@@ -95,7 +95,7 @@ full_kube_reinstall: False # undefined is False. #Make it False for faster redep
 etcd_clean: True # default is True, and it will cleanup /var/lib/etcd/ !
 #####
 
-#kubeadm_init_args: "--skip-preflight-checks" 
+#kubeadm_init_args: "--skip-preflight-checks"
 #kubeadm_join_args: "--skip-preflight-checks" #  For 1.8+ you may want to add: --discovery-token-unsafe-skip-ca-verification"
 #--ignore-preflight-errors=all
 #kubeadm_join_args: "--discovery-token-unsafe-skip-ca-verification"
@@ -111,6 +111,22 @@ ntp_setup: True  # Default True
 #  server pool.ntp.org
 #  server pool.ntp.org
 #####
+ntp_conf: |
+  driftfile /var/lib/ntp/ntp.drift
+  statistics loopstats peerstats clockstats
+  filegen loopstats file loopstats type day enable
+  filegen peerstats file peerstats type day enable
+  filegen clockstats file clockstats type day enable
+  pool 0.ubuntu.pool.ntp.org iburst
+  pool 1.ubuntu.pool.ntp.org iburst
+  pool 2.ubuntu.pool.ntp.org iburst
+  pool 3.ubuntu.pool.ntp.org iburst
+  pool ntp.ubuntu.com
+  restrict -4 default kod notrap nomodify nopeer noquery limited
+  restrict -6 default kod notrap nomodify nopeer noquery limited
+  restrict 127.0.0.1
+  restrict ::1
+  restrict source notrap nomodify noquery
 
 #####
 ## hostname fix: set_hostname_to_inventory_hostname
@@ -143,9 +159,9 @@ allow_restart: True ## Default False
 
 #####
 ## Iptables
-iptables_setup: True # Default is True. 
-# This is not ideal or perfect! Review code and decide. It will disable&mask firewalld service (if exists), set default policies ACCEPT, and it will remove REJECT rules from all chains (INPUT,FW,OUT) with a commands like: iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited (for each). 
-# If still issues, debug iptables on both master and nodes with: 
+iptables_setup: False # Default is True.
+# This is not ideal or perfect! Review code and decide. It will disable&mask firewalld service (if exists), set default policies ACCEPT, and it will remove REJECT rules from all chains (INPUT,FW,OUT) with a commands like: iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited (for each).
+# If still issues, debug iptables on both master and nodes with:
 # watch -n1 iptables -vnL
 # http://www.slsmk.com/how-to-log-iptables-dropped-packets-to-syslog/ and monitor with journalctl -kf
 ### # iptables_reset: False # False is default # Rarely used, this will be removed in the future

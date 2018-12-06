@@ -33,8 +33,8 @@ KubeProxyConfiguration:
   #   syncPeriod: 30s
   kind: KubeProxyConfiguration
   # metricsBindAddress: 127.0.0.1:10249
-  # mode: ""
-  mode: "ipvs"
+  mode: ""
+  # mode: "ipvs"
   ## Leave mode undefined or "" for the default, which usually is the old iptables method
   # nodePortAddresses: null
   # oomScoreAdj: -999

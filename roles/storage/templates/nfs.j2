@@ -1,7 +1,8 @@
 #https://github.com/kubernetes/kubernetes/blob/master/examples/volumes/nfs/provisioner/nfs-server-gce-pv.yaml
 #https://github.com/kubernetes-incubator/nfs-provisioner
+# https://github.com/kubernetes-incubator/external-storage/tree/master/nfs
 kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1alpha1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: nfs-provisioner-runner
 rules:
@@ -31,7 +32,7 @@ metadata:
   name: nfs-provisioner
 ---
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1alpha1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: run-nfs-provisioner
 subjects:
@@ -70,7 +71,7 @@ metadata:
 spec:
   replicas: 1
   strategy:
-    type: Recreate 
+    type: Recreate
   template:
     metadata:
       labels:
@@ -123,13 +124,15 @@ spec:
             path: {{ nfs_k8s.host_path }}
 ---
 kind: StorageClass
-apiVersion: storage.k8s.io/v1beta1
+# apiVersion: storage.k8s.io/v1beta1
+apiVersion: storage.k8s.io/v1
 metadata:
-  name: "{{nfs_k8s.provisioner }}"
+  name: "{{ nfs_k8s.provisioner }}"
   annotations:
     storageclass.beta.kubernetes.io/is-default-class: "{{ nfs_k8s.is_default_class | default('true') }}"
   labels:
     kubernetes.io/cluster-service: "true"
-provisioner: "{{nfs_k8s.provisioner }}"
+provisioner: {{ nfs_k8s.provisioner }}
 #parameters:
-
+mountOptions:
+  - vers=4.1

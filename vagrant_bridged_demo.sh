@@ -7,7 +7,7 @@ set -e
 HOST_BRIDGED_INTERFACE=`ip route | grep default | head -1 | cut -d" " -f5`
 # This is the same interface you may want to set in the Vagrantfile (or prompting you for)
 # This entire script works only with virtualbox provider
-# The script also modifies storage controller from IDE to SATA, and moves the disk from IDE to the newly created SATA 
+# The script also modifies storage controller from IDE to SATA, and moves the disk from IDE to the newly created SATA
 ###
 
 if [ $# -eq 0 ];then
@@ -28,7 +28,7 @@ fi
 # Optionally, when started with params like reset or init, it also does vagrant up, etc.
 while [ $# -gt 0 ]; do
  case $1 in
-  --full) 
+  --full)
     vagrant destroy -f || true
     vagrant up
     shift
@@ -117,7 +117,7 @@ if [ "${ACTIONS}x" != "regenerate_configx" ];then
     #### Change VM's network interfaces, NAT to bridged:
 
     #VBoxManage showvminfo $M | grep -i nic    #"--machinereadable"
-    VBoxManage modifyvm $vboxMUUID --nic1 none --nic2 none --nic3 none --nic4 none --nic5 none --nic6 none --nic7 none --nic8 none 
+    VBoxManage modifyvm $vboxMUUID --nic1 none --nic2 none --nic3 none --nic4 none --nic5 none --nic6 none --nic7 none --nic8 none
     VBoxManage modifyvm $vboxMUUID --nic1 bridged --bridgeadapter1 $HOST_BRIDGED_INTERFACE --nictype1 virtio --macaddress1 auto
     #VBoxManage modifyvm $vboxMUUID --nic1 bridged --bridgeadapter1 $HOST_BRIDGED_INTERFACE --nictype1 Am79C973 --macaddress1 auto
     #VBoxManage modifyvm $vboxMUUID --nic1 bridged --bridgeadapter1 $HOST_BRIDGED_INTERFACE --nictype1 virtio --macaddress1 auto
@@ -131,8 +131,8 @@ if [ "${ACTIONS}x" != "regenerate_configx" ];then
     IDE_VMDK_ImageUUID=$(VBoxManage showvminfo --machinereadable $vboxMUUID | grep -i "IDE" | grep ImageUUID | cut -d '"' -f4)
     if [ "${IDE_VMDK_ImageUUID}x" != "x" ]; then
       echo "Changind disk from IDE to SATA for disk IDE_VMDK_ImageUUID=$IDE_VMDK_ImageUUID "
-      VBoxManage storagectl $vboxMUUID --name "IDE Controller" --remove || true # remove IDE controller 
-      VBoxManage storagectl $vboxMUUID --name "IDE" --remove || true # remove IDE controller 
+      VBoxManage storagectl $vboxMUUID --name "IDE Controller" --remove || true # remove IDE controller
+      VBoxManage storagectl $vboxMUUID --name "IDE" --remove || true # remove IDE controller
       VBoxManage storagectl $vboxMUUID --name "SATA" --add sata --portcount 3 --hostiocache on --bootable on  # Add SATA controller
       VBoxManage storageattach $vboxMUUID --storagectl "SATA" --port 0 --type hdd --nonrotational on --medium $IDE_VMDK_ImageUUID  # Attach the previous disk to the new SATA controller
       #For SSD optionally add also: "--nonrotational on"
@@ -153,14 +153,14 @@ fi # Up to here we did actions when if [ "${ACTIONS}" != "regenerate_configx" ]
 ###
 echo "### Generating the list of machines which are up:"
 all_runningVagrMs=$(vagrant status | grep 'running (virtualbox)' | cut -d" " -f1)
-echo "   List of already started machines: $all_runningVagrMs" | tr '\n' ' ' 
+echo "   List of already started machines: $all_runningVagrMs" | tr '\n' ' '
 echo ""
 
 ###
 echo "### (re)Generating a ssh_config to be used by ssh (partially reusing vagrant generated ssh keys and config)"
 rm -f ssh_config
 for runningVagrM in $all_runningVagrMs ; do
-  vagrant ssh-config $runningVagrM | sed "s|^Host .*|Host ${runningVagrM}\*|g" | sed "/^ *HostName .*/d" | sed "s|^ *Port .*|  Port 22|g" | sed "s|^ *User .*|  User root|g" >>ssh_config
+  vagrant ssh-config $runningVagrM | sed "s|^Host .*|Host ${runningVagrM}\*|g" | sed "/^ *HostName .*/d" | sed "s|^ *Port .*|  Port 22|g" | sed "s|^ *User .*|  User vagrant|g" >>ssh_config
 done
 
 ###
@@ -172,7 +172,7 @@ done
 #done
 #set +vx
 
-### 
+###
 echo "### Creating list of machines with FQDN"
 runningVagrM_FQDN=""
 for runningVagrM in $all_runningVagrMs ; do
@@ -205,33 +205,51 @@ echo
 echo "### Creating an ./ansible.cfg to based on the above ssh_config file and some more options, for ansible to be able to login "
 cat << EOF >ansible.cfg
 [defaults]
-#remote_user=vagrant
-become=true
-become_method=sudo
+
+roles_path     = ./:./roles:/etc/ansible/roles
+inventory      = inventory.ini
+nocows=True
+retry_files_enabled = False
+# stdout_callback = debug
+callback_whitelist = actionable, profile_tasks, profile_roles, skippy, debug
 stdout_callback = debug
 
+# NOTE: Enabling pipelining reduces the number of SSH operations required to execute a module on the remote server, by executing many ansible modules without actual file transfer. This can result in a very significant performance improvement when enabled, however when using “sudo:” operations you must first disable ‘requiretty’ in /etc/sudoers on all managed hosts.
+pipelining = False
+
+become = True
+host_key_checking = False
+deprecation_warnings = False
+callback_whitelist = profile_tasks
+
 [ssh_connection]
-ssh_args = -C -o ControlMaster=auto -o ControlPersist=60s -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -F ./ssh_config 
+# NOTE: Occasionally users may be managing a remote system that doesn’t have SFTP enabled. If set to True, we can cause scp to be used to transfer remote files instead here's really no reason to change this unless problems are encountered, and then there’s also no real drawback to managing the switch. Most environments support SFTP by default and this doesn’t usually need to be changed.
+scp_if_ssh = False
+
+# ssh_args = -o ForwardAgent=yes
+host_key_checking = False
+ssh_args = -C -o ControlMaster=auto -o ControlPersist=60s -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ForwardAgent=yes -o PasswordAuthentication=no -o ControlPath=~/.ansible/cp/ansible-ssh-%h-%p-%r -F ./ssh_config
 pipelining = True
+
 EOF
 
 echo "  a local ./ansible.cfg has been generated with success. Contents:"
 cat ansible.cfg
 echo
 
-###
-echo "### Generating (guessing) inventory file based on host names (master must have word master in its name)"
-echo "[master]" > hosts
-#echo $all_runningVagrMs | tr ' ' '\n' | grep "master" >> hosts
-echo $all_runningVagrMs_postfqdn | tr ' ' '\n' | grep "master" >> hosts
-echo "[node]" >> hosts
-#echo $all_runningVagrMs | tr ' ' '\n' | grep -v "master" >> hosts
-echo $all_runningVagrMs_postfqdn | tr ' ' '\n' | grep -v "master" >> hosts
-number_nodes=$( echo $all_runningVagrMs_postfqdn | tr ' ' '\n' | grep -v "master" | wc -l )
-if [ $number_nodes -lt 1 ]; then
-  echo "no nodes were detected, so master will be also a node"
-  echo $all_runningVagrMs_postfqdn | tr ' ' '\n' | grep "master" >> hosts
-fi
+# ##
+# echo "### Generating (guessing) inventory file based on host names (master must have word master in its name)"
+# echo "[master]" > hosts
+# #echo $all_runningVagrMs | tr ' ' '\n' | grep "master" >> hosts
+# echo $all_runningVagrMs_postfqdn | tr ' ' '\n' | grep "master" >> hosts
+# echo "[node]" >> hosts
+# #echo $all_runningVagrMs | tr ' ' '\n' | grep -v "master" >> hosts
+# echo $all_runningVagrMs_postfqdn | tr ' ' '\n' | grep -v "master" >> hosts
+# number_nodes=$( echo $all_runningVagrMs_postfqdn | tr ' ' '\n' | grep -v "master" | wc -l )
+# if [ $number_nodes -lt 1 ]; then
+#   echo "no nodes were detected, so master will be also a node"
+#   echo $all_runningVagrMs_postfqdn | tr ' ' '\n' | grep "master" >> hosts
+# fi
 
 echo
 echo "### The autogenerated inventory (./hosts file) looks like this:"
@@ -241,9 +259,7 @@ cat <<EOF
 
 ### Vagrant should be up.
    You may now proceed wth reviewing configuration:
-       vi group_vars/all 
-   and then run ansible playbooks like site.yml 
-       ansible-playbook -i hosts -v site.ym"
+       vi group_vars/all
+   and then run ansible playbooks like site.yml
+       ansible-playbook -i hosts -v site.yml
 EOF
-
-

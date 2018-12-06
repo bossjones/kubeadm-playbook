@@ -15,7 +15,7 @@ vsphere_storageclass_urls:
   - https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/storage-class/vsphere/default.yaml
   #- https://raw.githubusercontent.com/kubernetes/kubernetes/master/examples/volumes/vsphere/vsphere-volume-sc-fast.yaml
 
-#vsphere_bug_fix github.com/vmware/kubernetes/issues/495 # For k8s 11.x 
+#vsphere_bug_fix github.com/vmware/kubernetes/issues/495 # For k8s 11.x
 vsphere_bug_fix: False
 
 #####
@@ -64,8 +64,9 @@ cloud_config: |
 nfs_k8s: #https://github.com/kubernetes/kubernetes/blob/master/examples/volumes/nfs/provisioner/nfs-server-gce-pv.yaml
          #https://github.com/kubernetes-incubator/nfs-provisioner
   #enabled: "true"
-  enabled: False
+  enabled: True
   provisioner: nfs.k8s
+  # provisioner: example.com/nfs
   # Path on the master node:
   host_path: /storage/nfs
   is_default_class: 'true' # case sensitive! Also: only one class can be default. Note that vpshere thin is also trying to be set as default, choose which one you want as default

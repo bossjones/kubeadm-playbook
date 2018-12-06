@@ -1,11 +1,16 @@
+[master]
+boss-master-01.scarlettlab.home
+[node]
+boss-worker-01.scarlettlab.home
+
 
 # Use FullyQualifiedDomainNames (FQDN) (e.g. machine1.corp.example.com)
-[primary-master]
-master1.corp.example.com
+[primary-master:children]
+master
 
 [secondary-masters]
 # If there is only one master, make this section empty
-master[2:3].corp.example.com
+# master[2:3].corp.example.com
 
 [masters:children]
 primary-master
@@ -23,7 +28,38 @@ secondary-etcds
 
 [nodes]
 # If there is only one machine both master and node, make this section empty
-node[1:2].corp.example.com
+boss-worker-01.scarlettlab.home
 
 [node:children]
 nodes
+
+
+
+# ------------
+
+
+[kubernetes-master:children]
+primary-master
+secondary-masters
+
+[kubernetes-master:vars]
+boss__kubernetes__kubeadm__server_type=master
+is_master=true
+
+[kubernetes-nodes:children]
+nodes
+
+[kubernetes-nodes:vars]
+boss__kubernetes__kubeadm__server_type=node
+is_master=false
+
+[kubernetes:children]
+kubernetes-master
+kubernetes-nodes
+
+[all:children]
+kubernetes
+
+[servers:children]
+kubernetes-master
+kubernetes-nodes

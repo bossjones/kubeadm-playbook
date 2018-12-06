@@ -17,8 +17,8 @@ ClusterConfiguration:
   kind: ClusterConfiguration
   kubernetesVersion: "v{{ KUBERNETES_VERSION }}"
   networking:
-  #   dnsDomain: cluster.local
-  #   serviceSubnet: 10.96.0.0/12
+    dnsDomain: cluster.local
+    serviceSubnet: 10.96.0.0/12
   #   podSubnet: ""
     podSubnet: "{{ POD_NETWORK_CIDR }}"
     #podSubnet: '10.244.0.0/16'  # Exactly this one is required when Flannel network is used. If you other network solutions, commented out this entry.

@@ -2,13 +2,13 @@
 [kubeadm-playboook ansible project's code is on Github](https://github.com/ReSearchITEng/kubeadm-playbook)
 
 # kubeadm based all in one kubernetes cluster installation (and addons) using Ansible
-Tested on for all Centos/RHEL 7.2+ (ideally 7.4/7.5) and Ubuntu 16.04 (both with overlay2 and automatic docker_setup).    
-Optionally, when docker_setup: True, this project will also setup the docker on the host if does not exist.     
+Tested on for all Centos/RHEL 7.2+ (ideally 7.4/7.5) and Ubuntu 16.04 (both with overlay2 and automatic docker_setup).
+Optionally, when docker_setup: True, this project will also setup the docker on the host if does not exist.
 
 ## Targets/pros&cons
-Kubeadm simplifies drastically the installation, so for BYO (vms,desktops,baremetal), complex projects like kubespray/kops are not required any longer. 
-This project targets to get a fully working environment in matter of minutes on any hw: baremetal, vms (vsphere, virtualbox), etc.    
-Major difference from other projects: it uses kubeadm for all activities, and kubernetes is running in containers.    
+Kubeadm simplifies drastically the installation, so for BYO (vms,desktops,baremetal), complex projects like kubespray/kops are not required any longer.
+This project targets to get a fully working environment in matter of minutes on any hw: baremetal, vms (vsphere, virtualbox), etc.
+Major difference from other projects: it uses kubeadm for all activities, and kubernetes is running in containers.
 The project is for those who want to create&recreate k8s cluster using the official method (kubeadm), with all production features:
 - Ingresses (via helm chart)
 - Persistent storage (ceph or vsphere)
@@ -30,7 +30,7 @@ The project is for those who want to create&recreate k8s cluster using the offic
 
 ## Prerequisites:
 - ansible min. 2.3 (but higher is recommeneded. Tested on current 2.5)
-- For a perfect experience, one should at least define a wildcard dns subdomain, to easily access the ingresses. The wildcard can pointed to the master (as it's quaranteed to exists).    
+- For a perfect experience, one should at least define a wildcard dns subdomain, to easily access the ingresses. The wildcard can pointed to the master (as it's quaranteed to exists).
 Note: dashboard will by default use the master machine, but also deploy under the provided domain (in parallel, only additional ingress rule)
 - if docker_setup is True, it will also attempt to define your docker and set it up with overlay2 storage driver (one needs CentOS 7.4+)
 - it will set required kernel modules (if desired)
@@ -43,7 +43,7 @@ Note: dashboard will by default use the master machine, but also deploy under th
 * Install the kubeadm repo
 * Install kubeadm, kubelet, kubernetes-cni, and kubectl
 * If desired, manipulate SELinux setting (control via `group_vars/all`)
-* Set kubelet `--cgroup-driver=systemd` , swap-off, and many other settings required by kubelet to work (control via `group_vars/all`)  
+* Set kubelet `--cgroup-driver=systemd` , swap-off, and many other settings required by kubelet to work (control via `group_vars/all`)
 * Reset activities (like kubeadm reset, unmount of `/var/lib/kubelet/*` mounts, ip link delete cbr0, cni0 , etc.) - important for reinstallations.
 * Initialize the cluster on master with `kubeadm init`
 * Install user specified pod network from `group_vars/all` (flannel, calico, weave, etc)
@@ -57,14 +57,14 @@ Note: dashboard will by default use the master machine, but also deploy under th
 * Sanity: checks if nodes are ready and if all pods are running, and provides details of the cluster.
 * when enabled, it will create ceph storage cluster using rook operator
 * when enabled, it will create vsphere persistent storage class and all required setup. Please fill in vcenter u/p/url,etc `group_vars/all`, and follow all initial steps there.
-* it will define a set of handy aliases 
+* it will define a set of handy aliases
 
-NOTE: It does support **http_proxy** configuration cases. Simply update the your proxy in the group_vars/all.    
-This has been tested with **RHEL&CentOS 7.3-7.5 and Ubuntu 16.04** and **Kubernetes v1.6.1 - v1.11.3**     
-In general, keep the kube* tools at the same minor version with the desired k8s cluster. (e.g. For installing k8s v1.7 one must also use kubeadm 1.7 (kubeadm limitation).)    
+NOTE: It does support **http_proxy** configuration cases. Simply update the your proxy in the group_vars/all.
+This has been tested with **RHEL&CentOS 7.3-7.5 and Ubuntu 16.04** and **Kubernetes v1.6.1 - v1.11.3**
+In general, keep the kube* tools at the same minor version with the desired k8s cluster. (e.g. For installing k8s v1.7 one must also use kubeadm 1.7 (kubeadm limitation).)
 FYI, higher kube* are usually supported with 1 minor version older cluster (e.g. kube[adm/ctl/let] 1.8.* accepts kubernetes cluster 1.7.*).
 
-If for any reason anyone needs to relax RBAC, they can do: 
+If for any reason anyone needs to relax RBAC, they can do:
 ```kubectl create -f https://github.com/ReSearchITEng/kubeadm-playbook/blob/master/allow-all-all-rbac.yml```
 
 # How To Use:
@@ -125,14 +125,14 @@ For LB, one may want to check also:
 # DEMO:
 Installation demo k8s 1.7.8 on CentOS 7.4: [kubeadm ansible playbook install demo asciinema video](https://asciinema.org/a/Ii7NDu3eL9DsuM1fEFM9PMVTM)
 
-## Vagrant 
+## Vagrant
 For using vagrant on one or multiple machines with bridged interface (public_network and ports accessible) all machines must have 1st interface as the bridged interface (so k8s processes will bind automatically to it). For this, use this script: vagrant_bridged_demo.sh.
 
 ### Steps to start Vagrant deployment:
 1. edit ./Vagrant file and set desired number of machines, sizing, etc.
 2. run:
 ```shell
-./vagrant_bridged_demo.sh --full [ --bridged_adapter <desired host interface|auto>  ] # bridged_adapter defaults to ip route | grep default | head -1 
+./vagrant_bridged_demo.sh --full [ --bridged_adapter <desired host interface|auto>  ] # bridged_adapter defaults to ip route | grep default | head -1
 ```
 After preparations (edit group_vars/all, etc.), run the ansible installation normally.
 
@@ -149,10 +149,10 @@ Our HA work is based on projects like: https://github.com/mbert/kubeadm2ha ( and
 
 ## Kubeadm -> the official k8s installer (yet to be GA).
 
-With kubeadm-playbook we are focus only kubeadm. 
+With kubeadm-playbook we are focus only kubeadm.
 **Pros:**
-- as it's the official k8s installation tool 
-- kubeadm is released with every k8s release, and you have a guarantee to be in sync with the official code. 
+- as it's the official k8s installation tool
+- kubeadm is released with every k8s release, and you have a guarantee to be in sync with the official code.
 - self hosted deployment, making upgrades very smooth ; Here is a KubeCon talk presenting even more reasons to go with self-hosted k8s: https://www.youtube.com/watch?v=jIZ8NaR7msI
 
 **Cons:**
@@ -166,7 +166,7 @@ Similar k8s install on physical/vagrant/vms (byo - on premises) projects you may
 - https://github.com/apprenda/kismatic -> very big project by apprenda, it supports cluster upgrades
 - https://github.com/kubernetes-incubator/kargo -> plans to use kubeadm in the future, for the activities kubeadm can do.
 - https://github.com/gluster/gluster-kubernetes/blob/master/vagrant/ -> it's much more simple, no ingress, helm, addons, proxy support, and persistent volumes only using glusterfs. Entire project is only focused on CentOS.
-- https://github.com/kubernetes-incubator/kubespray & https://github.com/kubernetes/kops (amazon) -> Neither of them use the official installtion tool: kubeadm, and that makes them heavy/big and require knowledge of "internals". 
+- https://github.com/kubernetes-incubator/kubespray & https://github.com/kubernetes/kops (amazon) -> Neither of them use the official installtion tool: kubeadm, and that makes them heavy/big and require knowledge of "internals".
 
 PRs are accepted and welcome.
 
@@ -174,4 +174,171 @@ PS: work inspired from: @sjenning - and the master ha part from @mbert. PRs & su
 [URL page of kubeadm-playboook ansible project](https://researchiteng.github.io/kubeadm-playbook/)
 [kubeadm-playboook ansible project's code is on Github](https://github.com/ReSearchITEng/kubeadm-playbook)
 
-License: Public Domain 
+License: Public Domain
+
+
+
+```
+
+[kubernetes-admin@bossk8s:default]  ~
+» bash-it show aliases
+Alias               Enabled?  Description
+ag                    [ ]     the silver searcher (ag) aliases
+ansible               [ ]     ansible abbreviations
+apt                   [ ]     Apt and dpkg aliases for Ubuntu and Debian distros.
+atom                  [ ]     Atom.io editor abbreviations
+bolt                  [ ]     puppet bolt aliases
+bundler               [ ]     ruby bundler
+clipboard             [ ]     pbcopy and pbpaste shortcuts to linux
+composer              [ ]     common composer abbreviations
+curl                  [ ]     Curl aliases for convenience.
+docker                [ ]     docker abbreviations
+docker-compose        [ ]     docker-compose abbreviations
+emacs                 [ ]     emacs editor
+fuck                  [ ]
+general               [x]     general aliases
+git                   [ ]     common git abbreviations
+gitsvn                [ ]     common git-svn abbreviations
+heroku                [ ]     heroku task abbreviations
+hg                    [ ]     mercurial abbreviations
+homebrew              [ ]     homebrew abbreviations
+homebrew-cask         [ ]     homebrew-cask abbreviations
+homesick              [ ]     homesick aliases
+jitsu                 [ ]     jitsu task abbreviations
+kubectl               [ ]     kubectl aliases
+laravel               [ ]     laravel artisan abbreviations
+maven                 [ ]     maven abbreviations
+npm                   [ ]     common npm abbreviations
+osx                   [ ]     osx-specific aliases
+phoenix               [ ]     phoenix abbreviations
+puppet                [ ]     puppet aliases
+pyrocms               [ ]     pyrocms abbreviations
+rails                 [ ]     rails abbreviations
+svn                   [ ]     common svn abbreviations
+systemd               [ ]     systemd service
+textmate              [ ]     textmate abbreviations
+tmux                  [ ]     Tmux terminal multiplexer
+todo.txt-cli          [ ]     todo.txt-cli abbreviations
+vagrant               [ ]     vagrant aliases
+vault                 [ ]     vault aliases
+vim                   [ ]     vim abbreviations
+yarn                  [ ]     yarn package manager aliases
+
+
+
+
+
+
+
+[kubernetes-admin@bossk8s:default]  ~
+» bash-it show plugins
+Plugin              Enabled?  Description
+alias-completion      [x]     Automatic completion of aliases
+autojump              [ ]     Autojump configuration, see https://github.com/wting/autojump for more details
+aws                   [ ]     AWS helper functions
+base                  [x]     miscellaneous tools
+battery               [ ]     display info about your battery charge level
+boot2docker           [ ]     Helpers to get Docker setup correctly for boot2docker
+browser               [ ]     render commandline output in your browser
+chruby-auto           [ ]     load chruby + auto-switching (from /usr/local/share/chruby)
+chruby                [ ]     load chruby                  (from /usr/local/share/chruby)
+direnv                [ ]     load direnv, if you are using it: https://direnv.net/
+dirs                  [ ]     directory stack navigation
+docker-compose        [ ]     Helper functions for using docker-compose
+docker-machine        [ ]     Helpers to get Docker setup correctly for docker-machine
+docker                [ ]     Helpers to more easily work with Docker
+edit-mode-emacs       [ ]     Enable emacs editing mode
+edit-mode-vi          [ ]     Enable vi editing mode
+explain               [ ]     mankier.com explain function to explain other commands
+extract               [ ]     one command to extract them all...
+fasd                  [ ]     initialize fasd (see https://github.com/clvv/fasd)
+fzf                   [ ]     load fzf, if you are using it
+gh                    [ ]     load gh, if you are using it (DEPRECATED, use hub instead)
+gif                   [ ]     video to gif, gif to WebM helper functions
+git                   [ ]     git helper functions
+git-subrepo           [ ]     load git-subrepo if you are using it, and initialize completions
+go                    [ ]     go environment variables & path configuration
+gradle                [ ]     Add a gw command to use gradle wrapper if present, else use system gradle
+hg                    [ ]     hg helper functions
+history               [ ]     history manipulation
+hub                   [ ]     load hub, if you are using it
+java                  [ ]     Java and JAR helper functions
+javascript            [ ]     download jquery files into current project
+jekyll                [ ]     manage your jekyll site
+jenv                  [ ]     load jenv, if you are using it
+jgitflow              [ ]     Maven jgitflow build helpers
+jump                  [ ]     initialize jump (see https://github.com/gsamokovarov/jump)
+latex                 [ ]     use mactex
+less-pretty-cat       [ ]     pygmentize instead of cat to terminal if possible
+nginx                 [ ]     manage your nginx service
+nodenv                [ ]     load nodenv, if you are using it
+node                  [ ]     Node.js helper functions
+nvm                   [ ]     node version manager configuration
+osx                   [ ]     osx-specific functions
+osx-timemachine       [ ]     OS X Time Machine functions
+percol                [ ]     Search&Select history and fasd with percol
+pipsi                 [ ]     load pipsi, if you are using it
+plenv                 [ ]     plenv plugin for Perl
+postgres              [ ]     postgres helper functions
+powerline             [ ]     enables powerline daemon
+projects              [ ]     add "export PROJECT_PATHS=~/projects:~/intertrode/projects" to navigate quickly to your project directories with `pj` and `pjo`
+proxy                 [ ]     Proxy Tools
+pyenv                 [ ]     load pyenv, if you are using it
+python                [ ]     alias "shttp" to SimpleHTTPServer
+rails                 [ ]     Helper functions for Ruby on Rails
+rbenv                 [ ]     load rbenv, if you are using it
+ruby                  [ ]     ruby and rubygems specific functions and settings
+rvm                   [ ]     load rvm, if you are using it
+sdkman                [ ]     Load Software Development Kit Manager
+sshagent              [ ]     sshagent helper functions
+ssh                   [ ]     ssh helper functions
+subversion            [ ]     svn helper functions
+textmate              [ ]     set textmate as a default editor
+tmuxinator            [ ]     sources tmuxinator script if available
+tmux                  [ ]     make sure that tmux is launched in 256 color mode
+todo                  [ ]     Todo.txt integration
+virtualenv            [ ]     virtualenvwrapper and pyenv-virtualenvwrapper helper functions
+visual-studio-code    [ ]     Defines the `code` executable for Visual Studio Code on OS X
+xterm                 [ ]     automatically set your xterm title with host and location info
+z_autoenv             [ ]     source into environment when cding to directories
+z                     [ ]     maintains a jump-list of the directories you actually use
+                              z is DEPRECATED, use fasd instead
+
+
+
+
+
+
+
+
+sudo apt-get install autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm3 libgdbm-dev -y
+
+
+curl -fsSL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-installer | bash
+curl -fsSL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-doctor | bash
+
+
+sudo add-apt-repository ppa:aacebedo/fasd -y
+sudo apt-get update
+sudo apt-get install fasd -y
+
+
+
+
+
+
+
+
+
+bash-it enable alias ag
+bash-it enable alias tmux
+bash-it enable alias curl
+
+
+bash-it enable alias plugin tmuxinator
+bash-it enable alias plugin proxy
+bash-it enable alias plugin tmux
+bash-it enable alias plugin fasd
+bash-it enable alias plugin fzf
+
+```

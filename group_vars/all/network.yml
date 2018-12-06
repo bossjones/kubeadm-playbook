@@ -1,5 +1,5 @@
 ## HA
-CLUSTER_NAME: demok8s  # used only for defining the clusterConfiguration and joinConfiguration k8s config, as well as the below dnsDomain and masterha_fqdn
+CLUSTER_NAME: bossk8s  # used only for defining the clusterConfiguration and joinConfiguration k8s config, as well as the below dnsDomain and masterha_fqdn
 
 ## ensure you have the DNS set for wildcard, and pointing all the trafic to master or similar setup
 custom:
@@ -10,11 +10,12 @@ custom:
     fqdn: # decide where to force use fqdn for non masterha and nodes. When set to false, it will use the name as defined in the inventory file
       always: false # makes all the below true
       master: true  # when true, actions like wait/join will be done against dns name instead of IP
-      node: false   # when true, the join command will have --node-name set to fqdn. When false, k8s will set based on how node machine answers to the hostname command
+      node: true   # when true, the join command will have --node-name set to fqdn. When false, k8s will set based on how node machine answers to the hostname command
       etcd: false   # Relevant for MasterHA case(more than 1 node in the master group), ignored otherwise; When true, the etcd endpoints will be with fqdn, IP address otherwise
 
 # Select pod Network. One may add mode simply by adding the deployment url and pod netwrod cidr it needs
-podNetwork: 'flannel'
+# podNetwork: 'flannel'
+podNetwork: 'weavenet'
 #'weavenet'
 #'calico'
 
@@ -22,28 +23,36 @@ podNetwork: 'flannel'
 #   - podSubnet: 10.244.0.0/16
 #   - urls:
 #     - https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-# 
+#
 # calico:
 #   - podSubnet: 192.168.0.0/16
 #   - urls:
 #     - https://docs.projectcalico.org/v3.2/getting-started/kubernetes/installation/hosted/etcd.yaml
 #     - https://docs.projectcalico.org/v3.2/getting-started/kubernetes/installation/rbac.yaml
 #     - https://docs.projectcalico.org/v3.2/getting-started/kubernetes/installation/hosted/calico.yaml
-# 
+#
 # weavenet:
 #   - podSubnet: 10.32.0.0/12
 #   - urls:
 #     #- "https://cloud.weave.works/k8s/net?k8s-version={{ClusterConfiguration.kubernetesVersion}}&env.IPALLOC_RANGE={{POD_NETWORK_CIDR | default ('10.32.0.0/12') }}"
 #     - "https://cloud.weave.works/k8s/net?k8s-version={{ClusterConfiguration.kubernetesVersion}}&env.IPALLOC_RANGE='10.32.0.0/12'"
 
+weavenet:
+  - podSubnet: 10.32.0.0/12
+  - urls:
+    - "https://cloud.weave.works/k8s/net?k8s-version={{ClusterConfiguration.kubernetesVersion}}&env.IPALLOC_RANGE={{POD_NETWORK_CIDR | default ('10.32.0.0/12') }}"
+    # - "https://cloud.weave.works/k8s/net?k8s-version={{ClusterConfiguration.kubernetesVersion}}&env.IPALLOC_RANGE='10.32.0.0/12'"
+    # - "https://cloud.weave.works/k8s/net?k8s-version={{ClusterConfiguration.kubernetesVersion}}&env.IPALLOC_RANGE='10.32.0.0/12'"
+
+
 # Network settings
 # '10.244.0.0/16'  # Exactly this one is required when Flannel network is used. If you other network solutions, commented out this entry.
 # '192.168.0.0/16'  # Exactly this one is required when Calico network is used. If you other network solutions, this entry can be commented out.
 # '10.32.0.0/12'  # Exactly this one is required when Weave network is used (with defaults). If you other network solutions, this entry can be commented out.
 
-POD_NETWORK_CIDR: 10.244.0.0/16
+# POD_NETWORK_CIDR: 10.244.0.0/16
 #POD_NETWORK_CIDR: '192.168.0.0/16'
-#POD_NETWORK_CIDR: '10.32.0.0/12'
+POD_NETWORK_CIDR: '10.32.0.0/12'
 
 #####
 ## NETWORK
@@ -56,22 +65,22 @@ k8s_network_addons_urls:
 #  - https://docs.projectcalico.org/v3.2/getting-started/kubernetes/installation/hosted/etcd.yaml
 #  - https://docs.projectcalico.org/v3.2/getting-started/kubernetes/installation/rbac.yaml
 #  - https://docs.projectcalico.org/v3.2/getting-started/kubernetes/installation/hosted/calico.yaml
-## Other Calico version (newer, reusing etcd of k8s, but with other limitations, use with care): 
+## Other Calico version (newer, reusing etcd of k8s, but with other limitations, use with care):
 #   - https://docs.projectcalico.org/v3.2/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
 ## OLDER_CALICO:
 #   - https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/kubeadm/1.6/calico.yaml # versions are 2.4,2.5,2.6
-#     newer calico 3.0 :     
-#   - https://docs.projectcalico.org/v3.0/getting-started/kubernetes/installation/hosted/kubeadm/1.7/calico.yaml  
-## OR 
+#     newer calico 3.0 :
+#   - https://docs.projectcalico.org/v3.0/getting-started/kubernetes/installation/hosted/kubeadm/1.7/calico.yaml
+## OR
 ## Flanned: (for Flanned one has to also ensure above setting ClusterConfiguration.networking.podSubnet is set to 10.244.0.0/16 )
   ##- https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
   #- https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml # For latest, replace v0.9.0 with master
   #- https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml
   # flannel for 1.12 (fixes toleartions, and fix is not in v0.10.0)
-  - https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-# OR 
-## Weave: #https://www.weave.works/docs/net/latest/kubernetes/kube-addon/ 
+  # - https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+# OR
+## Weave: #https://www.weave.works/docs/net/latest/kubernetes/kube-addon/
  #- https://cloud.weave.works/k8s/net?k8s-version={{ClusterConfiguration.kubernetesVersion}}&{{POD_NETWORK_CIDR | default ('env.IPALLOC_RANGE=10.32.0.0/12') }}
- #- "https://cloud.weave.works/k8s/net?k8s-version={{ClusterConfiguration.kubernetesVersion}}&env.IPALLOC_RANGE={{POD_NETWORK_CIDR | default ('10.32.0.0/12') }}"
+ - "https://cloud.weave.works/k8s/net?k8s-version={{ClusterConfiguration.kubernetesVersion}}&env.IPALLOC_RANGE={{POD_NETWORK_CIDR | default ('10.32.0.0/12') }}"
 #####
 
