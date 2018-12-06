@@ -184,6 +184,9 @@ bridge-up:
 bridge-restart:
 	./vagrant_bridged_demo.sh --restart
 
+bridge-start:
+	./vagrant_bridged_demo.sh --start
+
 ssh-bridge-master:
 	ssh -F ./ssh_config boss-master-01.scarlettlab.home
 
