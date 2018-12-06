@@ -30,10 +30,10 @@
   #when: pre_pull_k8s_images is defined and pre_pull_k8s_images
   #when: pre_pull_k8s_images is defined and pre_pull_k8s_images and ClusterConfiguration.kubernetesVersion is defined
   #when: full_kube_reinstall is defined and full_kube_reinstall and ClusterConfiguration.kubernetesVersion is defined
-  when: 
+  when:
   - DOCKER_IMAGES is defined
-  - pre_pull_k8s_images is defined 
-  - pre_pull_k8s_images 
+  - pre_pull_k8s_images is defined
+  - pre_pull_k8s_images
   - images_repo is defined
   #- ClusterConfiguration.kubernetesVersion is defined
   #- ClusterConfiguration.apiVersion == "kubeadm.k8s.io/v1alpha1"
@@ -45,13 +45,13 @@
   - prepull_images
   register: command_result
   changed_when: '"Image is up to date" not in command_result.stdout or "Already exists" not in command_result.stdout'
-  when: 
-  - pre_pull_k8s_images is defined 
-  - pre_pull_k8s_images 
+  when:
+  - pre_pull_k8s_images is defined
+  - pre_pull_k8s_images
   - DOCKER_IMAGES is not defined or images_repo is not defined
   - ClusterConfiguration.kubernetesVersion is version_compare ( 'v1.11', '>=' )
 
-## 
+##
 - name: Remove /etc/systemd/system/kubelet.service.d/20-etcd-service-manager.conf if present from HA etcd setup time (in MasterHA)
   file: "path=/etc/systemd/system/kubelet.service.d/20-etcd-service-manager.conf state=absent"
 
@@ -60,7 +60,7 @@
   set_fact:
     extended_cert_list: "{{ [ansible_default_ipv4.address,inventory_hostname,inventory_hostname_short,custom.networking.masterha_fqdn,'127.0.0.1',custom.networking.masterha_vip | default(ansible_fqdn)] | union (ClusterConfiguration.apiServerCertSANs | default([]) ) }}"
     #extended_cert_list: "{{ [inventory_hostname,inventory_hostname_short] | union (ClusterConfiguration.apiServerCertSANs | default([kubernetes]) ) }}"
-  when: ClusterConfiguration is defined 
+  when: ClusterConfiguration is defined
 
 - name: merging {{ inventory_hostname,inventory_hostname_short }} to the ClusterConfiguration.apiServerCertSANs
   set_fact:
@@ -100,16 +100,16 @@
 - name: MasterHA - build etcd endpoints list using fqdn
   set_fact:
     extended_etcd_endpoints_list: "{{ groups['etcd'] | map('extract', hostvars, ['ansible_fqdn']) | map('regex_replace', '^(.*)$','https://\\1:2379') | list  }}"
-  when: 
+  when:
   - groups['masters'] | length > 1
   - custom.networking.fqdn.always or custom.networking.fqdn.etcd
 
 - name: MasterHA - build etcd endpoints list using ipv4
   set_fact:
     extended_etcd_endpoints_list: "{{ groups['etcd'] | map('extract', hostvars, ['ansible_default_ipv4','address']) | map('regex_replace', '^(.*)$','https://\\1:2379') | list  }}"
-  when: 
+  when:
   - groups['masters'] | length > 1
-  - custom.networking.fqdn.always == false 
+  - custom.networking.fqdn.always == false
   - custom.networking.fqdn.etcd == false
 
 - name: MasterHA - set etcd endpoints
@@ -118,7 +118,7 @@
       #union (ClusterConfiguration.etcd.endpoints | default([]) ) }}"
   when: groups['masters'] | length > 1
 
-### MasterHA: point master to the ETCD certs 
+### MasterHA: point master to the ETCD certs
 - name: MasterHA - set etcd cert file paths
   set_fact:
     ClusterConfiguration: "{{ ClusterConfiguration | combine ({ 'etcd' : { 'external':  item } }, recursive=True) }}"
@@ -167,7 +167,7 @@
       {{ KubeProxyConfiguration | to_nice_yaml }}
       ---
       {{ KubeletConfiguration | to_nice_yaml }}
-      
+
 - name: Make sure that kubelet is not up (when on secondary-masters)
   service: name=kubelet state=stopped
   when:
@@ -184,7 +184,7 @@
   set_fact:
     kubeadm_init_args: "{{ ' '.join((kubeadm_init_args | default(' '), '--ignore-preflight-errors=FileAvailable--etc-kubernetes-manifests-etcd.yaml', '--ignore-preflight-errors=Port-10250' )) }}"
     #, '--ignore-preflight-errors=DirAvailable--var-lib-etcd', '--ignore-preflight-errors=Port-2379'
-  when: 
+  when:
   - "'etcd' in group_names"
   - groups['etcd'] | length > 1
 
@@ -217,7 +217,7 @@
 # - name: find the token of the newly created cluster
 #   command: bash -c '/usr/bin/kubeadm token list | grep -v "<invalid>" | grep "system:bootstrappers" | grep "authentication" | tail -n 1 | cut -f 1 -d" "'
 #   register: kubeadm_token
-#   when: 
+#   when:
 #   - InitConfiguration is not defined or InitConfiguration.bootstrapTokens[0].token is not defined
 #     InitConfiguration.token is not defined
 #   - inventory_hostname in groups['primary-master'] or inventory_hostname == groups["master"][0]
@@ -256,7 +256,7 @@
 
 
 - name: export KUBECONFIG in master's ~/.bash_profile
-  lineinfile: 
+  lineinfile:
     dest: ~/.bash_profile
     line: "export KUBECONFIG=/etc/kubernetes/admin.conf"
     state: present
@@ -317,4 +317,8 @@
   - scale_dns
 
 
-
+- name: Get /etc/kubernetes/admin.conf and write it locally to ansible controller
+  fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: ./vagrant-admin.conf
+    flat: true
