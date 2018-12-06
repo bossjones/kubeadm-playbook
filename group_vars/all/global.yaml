@@ -9,6 +9,7 @@
 #  no_proxy: '127.0.0.1,localhost,.example.com,.svc,.local,/var/run/docker.sock,.sock,sock'
 #####
 
+# KUBERNETES_VERSION: "1.12.3"  # this is broken it seems
 KUBERNETES_VERSION: "1.12.1"
 # Software versions (used by installation, package manager, image pull, etc. )
 

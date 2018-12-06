@@ -214,7 +214,7 @@ dummy-web-server:
 busybox-pod:
 	kubectl run -it --rm --restart=Never busybox --image=busybox sh
 
-rebuild: destroy flush-cache bridge-up sleep ping-bridge run-bridge-ansible
+rebuild: destroy flush-cache bridge-up sleep ping-bridge run-bridge-ansible run-bridge-tools-ansible
 
 sleep:
 	sleep 300
