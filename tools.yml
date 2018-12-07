@@ -135,9 +135,12 @@
         - ngrep
         - unzip
         - nload
+        - jq
         - ncdu
         - traceroute
         - sysstat
+        # - ssldump
+        # - sslsplit
         - conntrack
         # NOTE: RUN THIS GUY
         - mtr
@@ -485,6 +488,17 @@
     with_items:
         - neofetch
 
+  - name: install tmux bash completion
+    shell: |
+      curl -L 'https://raw.githubusercontent.com/Bash-it/bash-it/master/completion/available/tmux.completion.bash' > /etc/bash_completion.d/tmux ;
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /etc/bash_completion.d/tmux
+
+  # https://raw.githubusercontent.com/Bash-it/bash-it/master/completion/available/tmux.completion.bash
+
   # $ sudo add-apt-repository ppa:dawidd0811/neofetch
   # $ sudo apt update && sudo apt install neofetch
 
@@ -510,3 +524,25 @@
   # $ echo 'source ~/.enhancd/init.sh' >> ~/.bashrc
   # $ echo 'ENHANCD_FILTER=fzy:fzf; export ENHANCD_FILTER' >> ~/.bashrc
   # $ echo "ENHANCD_HOOK_AFTER_CD='ls -A';export ENHANCD_HOOK_AFTER_CD" >> ~/.bashrc
+
+  - name: Install cheat
+    pip:
+      name: "cheat"
+
+
+  - name: install ~/.cheat for root and default user
+    shell: |
+      git clone https://github.com/bossjones/boss-cheatsheets ~/.cheat
+    become: '{{ item }}'
+    args:
+      executable: /bin/bash
+      creates: '$HOME/.cheat'
+    with_items:
+      - true  # Run as root
+      - false
+    tags:
+    - cheat
+
+- name: Install cheat
+  pip:
+    name: "cheat"

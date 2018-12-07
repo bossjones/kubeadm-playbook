@@ -1,0 +1,28 @@
+---
+- hosts: servers
+  gather_facts: True
+  become: yes
+  become_method: sudo
+  tags:
+    - servers
+  tasks:
+    - name: Get iptables rules
+      command: iptables -L --wait
+      register: iptablesrules
+      check_mode: no
+
+    # https://websistent.com/linux-iptables-log-everything/
+    - name: To log actions relating to INPUT,FORWARD,OUTPUT chain rule execute the following command as root
+      command: 'iptables -I {{item}} 1 -j LOG -m limit --limit 10/min -j LOG --log-prefix "IPTables-{{item}}: " --log-level 4'
+      # -m limit --limit 10/min -j LOG --log-prefix "IPTables-{{item}}: " --log-level 4
+      with_items:
+      - INPUT
+      - FORWARD
+      - OUTPUT
+
+    # - name: Save iptables rules
+    #   command: service iptables save
+
+    - name: save iptables rules (Debian)
+      shell: netfilter-persistent save
+      when: ansible_os_family == "Debian"

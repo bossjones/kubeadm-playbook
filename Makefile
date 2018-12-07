@@ -205,6 +205,9 @@ run-bridge-test-ansible:
 run-bridge-tools-ansible:
 	@ansible-playbook -i hosts tools.yml -v
 
+run-bridge-log-iptables-ansible:
+	@ansible-playbook -i hosts log_iptables.yml -v
+
 run-bridge-ansible-no-slow:
 	@ansible-playbook -i hosts site.yml -v --skip-tags "slow"
 
