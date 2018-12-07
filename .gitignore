@@ -5,3 +5,4 @@ ansible.cfg
 ssh_config*
 /hosts
 vagrant-admin.conf
+.envrc
