@@ -351,6 +351,8 @@
       executable: /bin/bash
       creates: /usr/local/bin/kubens
 
+  # MORE TOOLS FROM: https://medium.com/@jonyeezs/my-minimal-over-powered-linux-setup-guide-710931efb75b
+
   - name: install fzf for root and default user
     shell: |
       git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
