@@ -432,22 +432,34 @@
   # git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
   # ~/.fzf/install --all
 
-  - name: install gkill - Simplified and community-driven man pages
-    shell: |
-      umake go
-      go get github.com/heppu/gkill
-    # environment: '{{env_go}}'
-    environment:
-      GOROOT: /usr/local/go
-      GOPATH: /root
-      GO111MODULE: ""
-      PATH: "/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/go/bin"
+  # - name: install gkill - Simplified and community-driven man pages
+  #   shell: |
+  #     umake go
+  #     go get github.com/heppu/gkill
+  #   # environment: '{{env_go}}'
+  #   environment:
+  #     GOROOT: /usr/local/go
+  #     GOPATH: /root
+  #     GO111MODULE: ""
+  #     PATH: "/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/go/bin"
 
+  #   become: yes
+  #   become_method: sudo
+  #   args:
+  #     executable: /bin/bash
+  #     creates: /usr/local/go/bin/gkill
+
+  - name: install gkill - Interactice process killer for Linux and macOS
+    shell: |
+      curl -L 'https://github.com/heppu/gkill/releases/download/v1.0.2/gkill-linux-amd64' > /usr/local/bin/gkill
+      chmod +x /usr/local/bin/gkill
     become: yes
     become_method: sudo
     args:
       executable: /bin/bash
-      creates: /usr/local/go/bin/gkill
+      creates: /usr/local/bin/gkill
+
+  # https://github.com/heppu/gkill/releases/download/v1.0.2/gkill-linux-amd64
 
   - name: install grv - GRV — Git Repository Viewer
     shell: |
