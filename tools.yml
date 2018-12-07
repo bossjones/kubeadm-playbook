@@ -145,6 +145,20 @@
       executable: /bin/bash
       creates: /usr/local/bin/kube-prompt
 
+  # An interactive kubernetes client featuring auto-complete using go-prompt.
+  # https://github.com/boz/kail/releases/download/v0.7.0/kail_0.7.0_linux_amd64.tar.gz
+  - name: install kail
+    shell: |
+      wget https://github.com/boz/kail/releases/download/v0.7.0/kail_0.7.0_linux_amd64.tar.gz
+      tar xvf kail_0.7.0_linux_amd64.tar.gz
+      chmod +x kail
+      mv ./kail /usr/local/bin/kail
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/kail
+
   # Simplistic interactive filtering tool
   - name: install peco
     shell: |
