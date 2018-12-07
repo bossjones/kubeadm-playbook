@@ -432,11 +432,17 @@
   # git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
   # ~/.fzf/install --all
 
-  - name: install tldr - Simplified and community-driven man pages
+  - name: install gkill - Simplified and community-driven man pages
     shell: |
       umake go
       go get github.com/heppu/gkill
-    environment: '{{env_go}}'
+    # environment: '{{env_go}}'
+    environment:
+      GOROOT: /usr/local/go
+      GOPATH: /root
+      GO111MODULE: ""
+      PATH: "/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/go/bin"
+
     become: yes
     become_method: sudo
     args:
