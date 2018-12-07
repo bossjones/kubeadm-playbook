@@ -3,6 +3,8 @@
 ##############################################################################
 # # no_log: true
 - hosts: servers
+  vars:
+    go_version: "1.10"
   gather_facts: True
   become: yes
   become_method: sudo
@@ -13,6 +15,111 @@
     - tools
     - servers
   pre_tasks:
+
+  - name: Set system architecture for AMD64/x86_64
+    set_fact:
+      sys_arch: "amd64"
+    when: ansible_architecture is match("x86_64") or (ansible_architecture | lower) is match("amd64")
+
+  - name: Set system architecture for i386/x86
+    set_fact:
+      sys_arch: "386"
+    when: ansible_architecture is match("i386")
+
+  - name: Set system architecture for ARM64
+    set_fact:
+      sys_arch: "arm64"
+    when: ansible_architecture is match("arm64")
+
+  - name: Set system architecture for ARMv7
+    set_fact:
+      sys_arch: "armv7"
+    when: ansible_architecture is match("armv7.+")
+
+  - name: Set system architecture for ARMv6
+    set_fact:
+      sys_arch: "armv6"
+    when: ansible_architecture is match("armv6.+")
+
+  - name: Set system architecture for ARMv5
+    set_fact:
+      sys_arch: "armv5"
+    when: ansible_architecture is match("armv5.+")
+
+  - name: Set system architecture for ansible var apt_arch
+    set_fact:
+      apt_arch: "{{sys_arch}}"
+
+  - name: install go
+    unarchive:
+      src: 'https://storage.googleapis.com/golang/go{{ go_version }}.linux-{{ sys_arch }}.tar.gz'
+      remote_src: yes
+      dest: /usr/local
+      mode: 0777
+      creates: /usr/local/go/bin/go
+
+  # export PATH=$PATH:/usr/local/go/bin:${HOME}/go/bin
+  - name: set go env. vars. and add go to path
+    blockinfile:
+      dest: '$HOME/.bashrc'
+      block: |
+        export PATH=$PATH:/usr/local/go/bin
+        export GOPATH=$HOME
+      state: present
+      create: yes
+      mode: 0644
+    become: '{{ item }}'
+    with_items:
+      - true  # Run as root
+      - false # Run as SSH user
+
+  # - name: source ~/.bashrc from ~/.bash_profile
+  #   lineinfile:
+  #     dest: '$HOME/.bash_profile'
+  #     line: '[ -r $HOME/.bashrc ] && source $HOME/.bashrc'
+  #     state: present
+  #     create: yes
+  #     mode: 0644
+  #   become: '{{ item }}'
+  #   with_items:
+  #     - true  # Run as root
+  #     - false # Run as SSH user
+
+  - name: set fact env_go
+    set_fact:
+      env_go: '{{ env_go |default({}) | combine ({"PATH" : "/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/go/bin"  }) | combine ({"GOPATH" :"$HOME"}) }}'
+
+  # # NOTE: fast way to switch between clusters and namespaces in kubectl
+  # - name: install kubens - fast way to switch between clusters and namespaces in kubectl
+  #   shell: |
+  #     curl -L 'https://raw.githubusercontent.com/ahmetb/kubectx/master/kubens' > /usr/local/bin/kubens
+  #     chmod +x /usr/local/bin/kubens
+  #   become: yes
+  #   become_method: sudo
+  #   args:
+  #     executable: /bin/bash
+  #     creates: /usr/local/bin/kubens
+
+  - name: install fzy - A better fuzzy finder
+    shell: |
+      curl -L 'https://github.com/jhawthorn/fzy/releases/download/0.9/fzy_0.9-1_amd64.deb' > /usr/local/src/fzy_0.9-1_amd64.deb
+      apt -y /usr/local/src/fzy_0.9-1_amd64.deb
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/fzy
+
+#   wget https://github.com/jhawthorn/fzy/releases/download/0.9/fzy_0.9-1_amd64.deb
+# $ sudo dpkg -i fzy_0.9-1_amd64.deb
+
+  - name: "Install ubuntu-make"
+    package:
+      name: "{{ item }}"
+      state: present
+    with_items:
+        - ubuntu-make
+
   - name: "Install prereq tools"
     package:
       name: "{{ item }}"
@@ -244,6 +351,129 @@
       executable: /bin/bash
       creates: /usr/local/bin/kubens
 
+  - name: install fzf for root and default user
+    shell: |
+      git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+      ~/.fzf/install --all
+    become: '{{ item }}'
+    args:
+      executable: /bin/bash
+      creates: '$HOME/.fzf'
+    with_items:
+      - true  # Run as root
+      - false
+    tags:
+    - fzf
+
+
+  - name: install fzf for root and default user
+    shell: |
+      git clone https://github.com/b4b4r07/enhancd ~/.enhancd
+    become: '{{ item }}'
+    args:
+      executable: /bin/bash
+      creates: '$HOME/.enhancd'
+    with_items:
+      - true  # Run as root
+      - false
+    tags:
+    - enhanced
+
+# $ echo 'source ~/.enhancd/init.sh' >> ~/.zshrc
+# $ echo 'ENHANCD_FILTER=fzy:fzf; export ENHANCD_FILTER' >> ~/.zshrc
+# $ echo "ENHANCD_HOOK_AFTER_CD='ls -A';export ENHANCD_HOOK_AFTER_CD" >> ~/.zshrc
+
+  - name: source ~/.enhancd/init.sh to root/ssh user bashrc
+    lineinfile:
+      path: '$HOME/.bashrc'
+      line: 'source ~/.enhancd/init.sh'
+      create: yes
+    become: '{{ item }}'
+    with_items:
+      - true  # Run as root
+      - false # Run as SSH user
+
+
+  - name: "ENHANCD_FILTER=fzy:fzf; export ENHANCD_FILTER to root/ssh user bashrc"
+    lineinfile:
+      path: '$HOME/.bashrc'
+      line: 'ENHANCD_FILTER=fzy:fzf; export ENHANCD_FILTER'
+      create: yes
+    become: '{{ item }}'
+    with_items:
+      - true  # Run as root
+      - false # Run as SSH user
+
+  - name: "ENHANCD_HOOK_AFTER_CD='ls -A';export ENHANCD_HOOK_AFTER_CD to root/ssh user bashrc"
+    lineinfile:
+      path: '$HOME/.bashrc'
+      line: "ENHANCD_HOOK_AFTER_CD='ls -A';export ENHANCD_HOOK_AFTER_CD"
+      create: yes
+    become: '{{ item }}'
+    with_items:
+      - true  # Run as root
+      - false # Run as SSH user
+
+
+
+
+  - name: install tldr - Simplified and community-driven man pages
+    shell: |
+      curl -L 'https://raw.githubusercontent.com/raylee/tldr/master/tldr' > /usr/local/bin/tldr
+      chmod +x /usr/local/bin/tldr
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/tldr
+
+  # git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+  # ~/.fzf/install --all
+
+  - name: install tldr - Simplified and community-driven man pages
+    shell: |
+      umake go
+      go get github.com/heppu/gkill
+    environment: '{{env_go}}'
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/go/bin/gkill
+
+  - name: install grv - GRV — Git Repository Viewer
+    shell: |
+      curl -L 'https://github.com/rgburke/grv/releases/download/v0.1.2/grv_v0.1.2_linux64' > /usr/local/bin/grv
+      chmod +x /usr/local/bin/grv
+    become: yes
+    become_method: sudo
+    args:
+      executable: /bin/bash
+      creates: /usr/local/bin/grv
+
+  - name: Add repositories
+    apt_repository:
+      repo: 'ppa:dawidd0811/neofetch'
+      state: present
+      update_cache: yes
+    when: ansible_os_family == "Debian"
+
+  - name: "Install neofetch"
+    package:
+      name: "{{ item }}"
+      state: present
+    with_items:
+        - neofetch
+
+  # $ sudo add-apt-repository ppa:dawidd0811/neofetch
+  # $ sudo apt update && sudo apt install neofetch
+
+  # Dockly
+  # If you use Docker, here’s one for you. You get to see all your containers, their health and as well their logs. Check out their repo for a gif demo.
+  # npm install -g dockly
+
+  # env_go
+  # ALL THESE TOOLS CAME FROM: https://medium.com/@jonyeezs/my-minimal-over-powered-linux-setup-guide-710931efb75b
 
   ##############################################################################
   # Install osquery
@@ -253,3 +483,10 @@
   # $ sudo add-apt-repository 'deb [arch=amd64] https://pkg.osquery.io/deb deb main'
   # $ sudo apt update
   # $ sudo apt install osquery
+
+
+  # SOURCE: https://medium.com/@jonyeezs/my-minimal-over-powered-linux-setup-guide-710931efb75b
+  # $ git clone https://github.com/b4b4r07/enhancd ~/.enhancd
+  # $ echo 'source ~/.enhancd/init.sh' >> ~/.bashrc
+  # $ echo 'ENHANCD_FILTER=fzy:fzf; export ENHANCD_FILTER' >> ~/.bashrc
+  # $ echo "ENHANCD_HOOK_AFTER_CD='ls -A';export ENHANCD_HOOK_AFTER_CD" >> ~/.bashrc
