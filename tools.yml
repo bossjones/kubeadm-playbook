@@ -103,7 +103,7 @@
   - name: install fzy - A better fuzzy finder
     shell: |
       curl -L 'https://github.com/jhawthorn/fzy/releases/download/0.9/fzy_0.9-1_amd64.deb' > /usr/local/src/fzy_0.9-1_amd64.deb
-      apt -y /usr/local/src/fzy_0.9-1_amd64.deb
+      apt install -y /usr/local/src/fzy_0.9-1_amd64.deb
     become: yes
     become_method: sudo
     args:
