@@ -12,7 +12,7 @@
       check_mode: no
 
     - name: Open apiserver port with iptables
-      command: /sbin/iptables -I INPUT 1 -p tcp --dport {{ kube_master_api_port }} -j ACCEPT -m comment --comment "kube-apiserver"
+      command: /sbin/iptables -I INPUT 1 -p tcp --dport 10255 -j ACCEPT -m comment --comment "kube-apiserver"
       when: "'kube-apiserver' not in iptablesrules.stdout"
       notify:
         - restart iptables
@@ -53,3 +53,26 @@
     - name: Save iptables rules
       command: service iptables save
       when: "'kubelet' not in iptablesrules.stdout"
+
+
+# https://github.com/kubernetes/contrib/blob/master/ansible/roles/node/tasks/iptables.yml
+# https://github.com/kubernetes/contrib/blob/master/ansible/roles/master/tasks/iptables.yml
+# iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+# iptables -A INPUT -p tcp --dport 2376 -j ACCEPT
+# iptables -A INPUT -p tcp --dport 2377 -j ACCEPT
+# iptables -A INPUT -p tcp --dport 7946 -j ACCEPT
+# iptables -A INPUT -p udp --dport 7946 -j ACCEPT
+# iptables -A INPUT -p udp --dport 4789 -j ACCEPT
+
+
+
+#   # Currently it will disable the REJECT rules and change policy to allow all.
+#   # For making pin-pointed rules, one may look at:
+#   # https://github.com/kubernetes/contrib/blob/master/ansible/roles/node/tasks/iptables.yml
+#   # For weave netw plugin, open also: TCP 6783 and UDP 6783/6784
+
+
+
+# iptables -A INPUT -p tcp --dport 6783 -j ACCEPT
+# iptables -A INPUT -p udp --dport 6783 -j ACCEPT
+# iptables -A INPUT -p udp --dport 6784 -j ACCEPT
