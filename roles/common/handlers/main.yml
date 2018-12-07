@@ -19,8 +19,17 @@
   systemd: name=iptables state=restarted enabled=yes
 
 - name: Reboot
-  shell: sleep 2 && /sbin/shutdown -r now 
+  shell: sleep 2 && /sbin/shutdown -r now
   async: 1
   poll: 0
   ignore_errors: yes
   when: allow_restart | default ( false )
+
+- name: kubectl completion bash > /etc/bash_completion.d/kubectl
+  shell: kubectl completion bash > /etc/bash_completion.d/kubectl
+
+- name: helm completion bash > /etc/bash_completion.d/helm
+  shell: helm completion bash > /etc/bash_completion.d/helm
+
+- name: kubeadm completion bash > /etc/bash_completion.d/kubeadm
+  shell: kubeadm completion bash > /etc/bash_completion.d/kubeadm

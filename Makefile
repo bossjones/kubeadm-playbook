@@ -219,6 +219,12 @@ rebuild: destroy flush-cache bridge-up sleep ping-bridge run-bridge-ansible run-
 sleep:
 	sleep 300
 
+deploy-rbac:
+	kubectl create -f deploy/allow-all-all-rbac.yml
+
+deploy-dashboard-admin:
+	kubectl create -f deploy/dashboard-admin.yaml
+
 # nvm-install:
 # 	nvm install stable ;
 # 	nvm use stable ;
