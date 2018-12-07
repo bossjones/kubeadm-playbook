@@ -240,6 +240,9 @@ deploy-dashboard-admin:
 # 	kubectl get pods -l app=hostnames ; \
 # 	kubectl expose deployment hostnames --port=80 --target-port=9376 ; \
 
+pip-install-pygments:
+	pip install Pygments
+
 # SOURCE: https://github.com/bossjones/boss-kubernetes-lab/blob/master/charts/helm/Makefile
 # kubectl logs -n ingress-nginx nginx-ingress-controller-f88c75bc6-4xkfw
 debug-nginx-ingress-resource-events:
