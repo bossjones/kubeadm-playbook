@@ -13,7 +13,7 @@
 
     # https://websistent.com/linux-iptables-log-everything/
     - name: To log actions relating to INPUT,FORWARD,OUTPUT chain rule execute the following command as root
-      command: 'iptables -I {{item}} 1 -j LOG -m limit --limit 10/min -j LOG --log-prefix "IPTables-{{item}}: " --log-level 4'
+      command: 'iptables -I {{item}} 1 -j LOG -m limit --limit 10/min --log-prefix "IPTables-{{item}}: " --log-level 4'
       # -m limit --limit 10/min -j LOG --log-prefix "IPTables-{{item}}: " --log-level 4
       with_items:
       - INPUT
