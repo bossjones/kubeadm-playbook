@@ -4,8 +4,9 @@ CLUSTER_NAME: bossk8s  # used only for defining the clusterConfiguration and joi
 ## ensure you have the DNS set for wildcard, and pointing all the trafic to master or similar setup
 custom:
   networking:
-    dnsDomain: "{{ CLUSTER_NAME }}.myk8s.corp.example.com"  # For MasterHA, if you have dns, put the desired cluster domain here. If no DNS change possible on your side, and you want MasterHA, fix the below 2 values accordinly
-    masterha_fqdn: "master-{{ CLUSTER_NAME }}.corp.example.com"  # Important when you have MasterHA, in order to set apiServerCertSANs correctly
+    # dnsDomain: "{{ CLUSTER_NAME }}.myk8s.corp.example.com"  # For MasterHA, if you have dns, put the desired cluster domain here. If no DNS change possible on your side, and you want MasterHA, fix the below 2 values accordinly
+    dnsDomain: "{{ CLUSTER_NAME }}.myk8s.corp.bosslab.com"  # For MasterHA, if you have dns, put the desired cluster domain here. If no DNS change possible on your side, and you want MasterHA, fix the below 2 values accordinly
+    masterha_fqdn: "master-{{ CLUSTER_NAME }}.corp.bosslab.com"  # Important when you have MasterHA, in order to set apiServerCertSANs correctly
     masterha_vip: "10.1.2.3" #| default('') }}"  # Important when you have MasterHA
     fqdn: # decide where to force use fqdn for non masterha and nodes. When set to false, it will use the name as defined in the inventory file
       always: false # makes all the below true

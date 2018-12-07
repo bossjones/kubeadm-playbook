@@ -239,3 +239,42 @@ deploy-dashboard-admin:
 #     --replicas=3 ; \
 # 	kubectl get pods -l app=hostnames ; \
 # 	kubectl expose deployment hostnames --port=80 --target-port=9376 ; \
+
+# SOURCE: https://github.com/bossjones/boss-kubernetes-lab/blob/master/charts/helm/Makefile
+# kubectl logs -n ingress-nginx nginx-ingress-controller-f88c75bc6-4xkfw
+debug-nginx-ingress-resource-events:
+	kubectl get ing -n ingress-nginx; \
+	kubectl describe ing nginx-welcome -n nginx-welcome; \
+	kubectl get pods -n ingress-nginx; \
+	echo "Check if used service exists"; \
+	kubectl get svc --all-namespaces; \
+	kubectl get pods --all-namespaces -l app.kubernetes.io/name=ingress-nginx --watch
+
+
+####################################################################
+# nginx-welcome
+####################################################################
+
+# SOURCE: https://docs.bitnami.com/kubernetes/how-to/create-your-first-helm-chart/
+helm-deploy-nginx-welcome:
+	helm install --wait --debug -n nginx-welcome ./deploy/nginx-welcome; \
+	helm ls -a
+
+helm-purge-nginx-welcome:
+	helm delete --purge nginx-welcome || (exit 1); \
+	helm ls -a
+
+helm-dry-run-nginx-welcome:
+	helm install --wait --dry-run --debug -n nginx-welcome ./deploy/nginx-welcome | pygmentize -l yaml
+
+yamllint-nginx-welcome:
+	@echo "Running YAML Lint Script:"
+	@echo "YAML audit"
+	@yamllint --version
+	bash -c "find ${PWD}/deploy/nginx-welcome -type f -name '*.y*ml' -print0 | xargs -I FILE -t -0 -n1 yamllint FILE"
+
+lint-nginx-welcome:
+	helm lint ./deploy/nginx-welcome
+
+describe-nginx-welcome:
+	kubectl describe ing nginx-welcome
