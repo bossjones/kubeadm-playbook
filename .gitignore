@@ -6,3 +6,7 @@ ssh_config*
 /hosts
 vagrant-admin.conf
 .envrc
+
+
+debug_ansible/
+dump/

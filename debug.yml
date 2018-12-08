@@ -1,0 +1,24 @@
+---
+- hosts: servers
+  gather_facts: no
+  become: yes
+  become_method: sudo
+  vars:
+    boss__debug__dump_type: 'seperate'
+  tags:
+    - debug
+  roles:
+    - role: boss-ansible-role-debug
+      boss__debug__dump_type: 'seperate'
+
+  tasks:
+
+  # SOURCE: https://serverfault.com/questions/691080/how-to-fetch-multiple-files-from-remote-machine-to-local-with-ansible
+  - name: find debug dump files
+    shell: (cd /etc/ansible_dumps; find . -maxdepth 1 -type f) | cut -d'/' -f2
+    register: files_to_copy
+
+  - name: fetch debug data
+    fetch: src=/etc/ansible_dumps/{{ item }} dest=./debug_ansible/
+    with_items:
+    - "{{files_to_copy.stdout_lines}}"

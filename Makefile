@@ -211,6 +211,9 @@ run-bridge-log-iptables-ansible:
 run-bridge-ansible-no-slow:
 	@ansible-playbook -i hosts site.yml -v --skip-tags "slow"
 
+run-bridge-debug-ansible:
+	@ansible-playbook -i hosts debug.yml -v
+
 dummy-web-server:
 	python dummy-web-server.py
 
@@ -284,3 +287,49 @@ lint-nginx-welcome:
 
 describe-nginx-welcome:
 	kubectl describe ing nginx-welcome
+
+dump:
+	kubectl cluster-info dump --all-namespaces --output-directory=./dump
+
+# https://github.com/kubernetes/dashboard/wiki/Access-control#bearer-token
+get-secrets:
+	kubectl -n kube-system get secret
+
+list-chart-versions-dashboard:
+	helm search stable/kubernetes-dashboard -l
+
+addon-dashboard:
+	kubectl apply -f ./addon/dashboard/kubernetes-dashboard.yaml
+
+
+####################################################
+####### addon commands
+####################################################
+
+# -----------------------------
+# DNS -----
+# -----------------------------
+
+# ingress.hosts[0]=dashboard.bossk8s.myk8s.corp.bosslab.com,
+# ingress.hosts[1]=master-bossk8s.corp.bosslab.com,
+# ingress.hosts[2]=boss-master-01.scarlettlab.home
+
+# - { name: prometheus, repo: stable/prometheus-operator, namespace: monitoring, options: '--set prometheus.ingress.enabled=True --set prometheus.ingress.hosts[0]=prometheus.{{ custom.networking.dnsDomain }} --set grafana.ingress.enabled=True --set grafana.ingress.hosts[0]=grafana.{{ custom.networking.dnsDomain }} --set alertmanager.ingress.enabled=True --set alertmanager.ingress.hosts[0]=alertmanager.{{ custom.networking.dnsDomain }}
+
+# - { name: nginx-ingress, repo: stable/nginx-ingress, namespace: kube-system, options: '--set rbac.create=true --set controller.stats.enabled=true --set controller.service.type=NodePort --set controller.service.nodePorts.http=80 --set controller.service.nodePorts.https=443 --version=0.29.1 ' }
+# - { name: heapster, repo: stable/heapster, namespace: kube-system, options: '--set service.nameOverride=heapster,rbac.create=true' }
+
+# - { name: dashboard, repo: stable/kubernetes-dashboard, namespace: kube-system, options: '--set rbac.create=True,rbac.clusterAdminRole=True,ingress.enabled=True,ingress.hosts[0]=dashboard.{{ custom.networking.dnsDomain }},ingress.hosts[1]={{ custom.networking.masterha_fqdn | default (groups["primary-master"][0]) }},ingress.hosts[2]={{ groups["primary-master"][0] }},image.tag=v1.10.0 --version=0.5.3' }
+
+# - { name: kured, repo: stable/kured, namespace: kube-system, options: '--set extraArgs.period="0h07m0s"' }
+
+
+# --------------------------------------------------
+# LIST OF SERVICES TO DEPLOY
+# --------------------------------------------------
+# heapster        1               Wed Dec  5 23:42:42 2018        DEPLOYED        heapster-0.3.2                  1.5.2           kube-system
+# kured           1               Wed Dec  5 23:42:46 2018        DEPLOYED        kured-0.1.2                     1.1.0           kube-system
+# nginx-ingress   1               Wed Dec  5 23:42:41 2018        DEPLOYED        nginx-ingress-0.29.1            0.20.0          kube-system
+# nginx-welcome   1               Thu Dec  6 23:01:12 2018        DEPLOYED        nginx-welcome-0.1.0             1.0             default
+# prometheus      1               Wed Dec  5 23:42:51 2018        DEPLOYED        prometheus-operator-0.1.29      0.25.0          monitoring
+# weave-scope     1               Thu Dec  6 00:57:55 2018        DEPLOYED        weave-scope-0.10.0              1.9.1           default
