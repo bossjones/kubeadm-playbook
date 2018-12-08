@@ -7,9 +7,18 @@ metadata:
     kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
     kubernetes.io/name: "Heapster"
-spec: 
-  ports: 
+    # The name of the application
+    app.kubernetes.io/name: heapster
+    # The name of a higher level application this one is part of
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  ports:
     - port: 80
       targetPort: 8082
-  selector: 
+  selector:
     k8s-app: heapster
+    # The name of the application
+    app.kubernetes.io/name: heapster
+    # The name of a higher level application this one is part of
+    app.kubernetes.io/part-of: ingress-nginx
+  type: NodePort

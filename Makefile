@@ -325,7 +325,7 @@ addon-ingress-nginx:
 	kubectl apply -f ./addon/ingress-nginx/service-nodeport.yaml
 
 debug-ingress-nginx:
-	kubectl --all-namespaces describe -f addon/ingress-nginx/
+	kubectl describe -f ./addon/ingress-nginx/
 
 watch-ingress-nginx:
 	kubectl get pods --all-namespaces -l app.kubernetes.io/name=ingress-nginx --watch
@@ -339,6 +339,15 @@ delete-ingress-nginx:
 # kubectl exec -it $POD_NAME -- /nginx-ingress-controller --version
 
 #  helm install stable/nginx-ingress --name uck-nginx --namespace kube-system --set controller.hostNetwork=true,controller.kind=DaemonSet --set rbac.create=true
+
+addon-heapster:
+	kubectl apply -f ./addon/heapster/
+
+delete-heapster:
+	kubectl delete -f ./addon/heapster/
+
+debug-heapster:
+	kubectl describe -f ./addon/heapster/
 
 # NOTE:
 # NOTE:

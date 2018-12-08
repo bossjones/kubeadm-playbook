@@ -7,6 +7,10 @@ metadata:
     kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
     kubernetes.io/name: "Grafana"
+    # The name of the application
+    app.kubernetes.io/name: grafana
+    # The name of a higher level application this one is part of
+    app.kubernetes.io/part-of: ingress-nginx
 spec:
   # On production clusters, consider setting up auth for grafana, and
   # exposing Grafana either using a LoadBalancer or a public IP.
@@ -15,6 +19,10 @@ spec:
     - port: 3000
       protocol: TCP
       targetPort: ui
+      # SOURCE: https://kubernetes.io/docs/concepts/services-networking/service/
   selector:
     k8s-app: influxGrafana
-#  type: NodePort
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/part-of: ingress-nginx
+  type: NodePort
+  # type: NodePort
