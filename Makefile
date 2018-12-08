@@ -366,6 +366,21 @@ debug-heapster-helm:
 # dashboard
 # weave-scope
 
+# Trying something new
+# https://github.com/kubernetes/ingress-nginx/blob/master/docs/deploy/baremetal.md
+addon-ingress-nginx2:
+	kubectl apply -f ./addon/ingress-nginx2
+
+debug-ingress-nginx2:
+	kubectl describe -f ./addon/ingress-nginx2/
+
+watch-ingress-nginx2:
+	kubectl get pods --all-namespaces -l app.kubernetes.io/name=ingress-nginx --watch
+
+delete-ingress-nginx2:
+	kubectl delete -f ./addon/ingress-nginx2
+
+
 ####################################################
 ####### addon commands
 ####################################################

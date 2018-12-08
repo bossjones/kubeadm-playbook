@@ -143,7 +143,7 @@ spec:
           # - "--source=kubernetes.summary_api:''"
           - "--source=kubernetes.summary_api:https://kubernetes.default:443?useServiceAccount=true&kubeletHttps=true&kubeletPort=10250&insecure=true"
           - "--sink=log"
-          # - "--vmodule=*=4"
+          - "--vmodule=*=2"
           # - "--api-server"
           # - "--sink=influxdb:http://monitoring-influxdb.kube-system.svc:8086"
 
