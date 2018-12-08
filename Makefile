@@ -302,8 +302,26 @@ addon-dashboard:
 	kubectl apply -f ./addon/dashboard/kubernetes-dashboard.yaml
 
 addon-weave-scope:
-	kubectl apply -f ./addon/weave-scope/scope-latest.yaml
+	kubectl -n weave apply -f ./addon/weave-scope/scope.yaml
 
+delete-weave-scope:
+	kubectl -n weave delete -f ./addon/weave-scope/scope.yaml
+
+debug-weave-scope:
+	kubectl -n weave describe deployment weave-scope-app
+	kubectl -n weave describe svc weave-scope
+	kubectl -n weave describe ds weave-scope-agent
+
+# NOTE:
+# NOTE:
+# NOTE:
+# NOTE:
+# NOTE:
+# Order of operations
+# ansible
+# rbac
+# dashboard
+# weave-scope
 
 ####################################################
 ####### addon commands
