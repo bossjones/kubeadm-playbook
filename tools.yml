@@ -543,6 +543,26 @@
     tags:
     - cheat
 
-- name: Install cheat
-  pip:
-    name: "cheat"
+  - name: Install cheat
+    pip:
+      name: "cheat"
+
+  # https://github.com/nodesource/distributions/blob/master/README.md
+  - name: install node version v11.4.0
+    shell: |
+      curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
+      apt-get install -y nodejs
+      apt-get install -y gcc g++ make
+      npm install -g docker-loghose
+      npm install -g docker-enter
+    become: '{{ item }}'
+    args:
+      executable: /bin/bash
+      creates: '/usr/bin/npm'
+    with_items:
+      - true  # Run as root
+    tags:
+    - node
+    - npm
+
+# TODO: Install
