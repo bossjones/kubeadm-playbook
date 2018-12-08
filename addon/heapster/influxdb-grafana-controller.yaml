@@ -11,6 +11,7 @@ metadata:
     version: v4
     kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
+    # kubernetes.io/ingress.class: "nginx"
 spec:
   replicas: 1
   selector:
@@ -69,6 +70,7 @@ spec:
             - name: INFLUXDB_SERVICE_URL
               # ORIG: value: http://monitoring-influxdb:8086
               value: http://localhost:8086
+              # value: http://monitoring-influxdb:8086
               # The following env variables are required to make Grafana accessible via
               # the kubernetes api-server proxy. On production clusters, we recommend
               # removing these env variables, setup auth for grafana, and expose the grafana
