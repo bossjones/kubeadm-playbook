@@ -344,14 +344,17 @@ delete-ingress-nginx:
 #  helm install stable/nginx-ingress --name uck-nginx --namespace kube-system --set controller.hostNetwork=true,controller.kind=DaemonSet --set rbac.create=true
 
 addon-heapster:
-	kubectl apply -f ./addon/heapster/
+	kubectl apply -f ./addon/heapster2/
 
 delete-heapster:
-	kubectl delete -f ./addon/heapster/
+	kubectl delete -f ./addon/heapster2/
 
 debug-heapster:
-	kubectl describe -f ./addon/heapster/
+	kubectl describe -f ./addon/heapster2/
 
+debug-heapster-helm:
+	echo "heapster must already be deployed on cluster!!"
+	helm get manifest heapster
 # NOTE:
 # NOTE:
 # NOTE:
