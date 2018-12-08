@@ -3,6 +3,14 @@
 
 # You can grant full admin privileges to Dashboard's Service Account by creating below ClusterRoleBinding. Copy the YAML file based on chosen installation method and save as, i.e. dashboard-admin.yaml. Use kubectl create -f dashboard-admin.yaml to deploy it. Afterwards you can use Skip option on login page to access Dashboard.
 
+
+# RUN THIS BEFORE DEPLOYING helm
+# https://github.com/kubernetes/dashboard/wiki/Access-control#admin-privileges
+
+# helm install stable/kubernetes-dashboard --name kubernetes-dashboard --set fullnameOverride=kubernetes-dashboard,rbac.create=True,rbac.clusterAdminRole=True,ingress.enabled=True,ingress.hosts[0]=dashboard.{{ custom.networking.dnsDomain }},ingress.hosts[1]={{ custom.networking.masterha_fqdn | default (groups["primary-master"][0]) }},ingress.hosts[2]={{ groups["primary-master"][0] }},image.tag=v1.10.0,serviceAccount.name=kubernetes-dashboard --version=0.5.3
+
+# name: dashboard, repo: stable/kubernetes-dashboard, namespace: kube-system, options: '--set rbac.create=True,rbac.clusterAdminRole=True,ingress.enabled=True,ingress.hosts[0]=dashboard.{{ custom.networking.dnsDomain }},ingress.hosts[1]={{ custom.networking.masterha_fqdn | default (groups["primary-master"][0]) }},ingress.hosts[2]={{ groups["primary-master"][0] }},image.tag=v1.10.0 --version=0.5.3'
+
 # Official release
 
 # https://github.com/kubernetes/dashboard/wiki/Access-control#kubeconfig
