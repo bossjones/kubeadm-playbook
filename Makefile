@@ -382,6 +382,26 @@ delete-ingress-nginx2:
 
 
 ####################################################
+####### addon http-svc
+####################################################
+
+addon-http-svc:
+	kubectl apply -f ./addon/http-svc
+
+debug-http-svc:
+	@echo
+	kubectl describe -f ./addon/http-svc/
+	@echo
+	kubectl get svc http-svc
+	@echo
+
+test-http-svc:
+	@bash ./scripts/curl-http-svc.sh
+
+delete-http-svc:
+	kubectl delete -f ./addon/http-svc
+
+####################################################
 ####### addon commands
 ####################################################
 

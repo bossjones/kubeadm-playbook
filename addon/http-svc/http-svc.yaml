@@ -1,0 +1,85 @@
+# SOURCE: wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/docs/examples/http-svc.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: http-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: http-svc
+  template:
+    metadata:
+      labels:
+        app: http-svc
+    spec:
+      containers:
+      - name: http-svc
+        image: gcr.io/kubernetes-e2e-test-images/echoserver:2.1
+        ports:
+        - containerPort: 8080
+        env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-svc
+  labels:
+    app: http-svc
+    task: test
+  annotations:
+    # SOURCE: https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/multiple-ingress-controllers
+    # NOTE: To designate that a particular Ingress resource must be handled only by the NGINX or NGINX Plus controller add the following annotation along with the value to the Ingress resource:
+    kubernetes.io/ingress.class: "nginx"
+    kubernetes.io/tls-acme: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    # Note the nginx.ingress.kubernetes.io/ssl-redirect annotation. It is used since we are not specifying a host. When no host is specified, then the default-server is hit, which is configured with a self-signed certificate, and redirects http to https. This issue explains more.
+    # https://github.com/kubernetes/ingress-nginx/issues/1567
+    nginx.ingress.kubernetes.io/ssl-redirect: \"false\"
+    # SOURCE: https://medium.com/@Oskarr3/setting-up-ingress-on-minikube-6ae825e98f82
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  #   kubernetes.io/ingress.class: nginx
+  #   kubernetes.io/tls-acme: 'true'
+  # DISABLED # labels: {}
+# INFO: https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ports-targetport-nodeport-service.html
+
+
+# ------------------------------------------------------------------------------------------------------------------------------------
+# |nodePort| This setting makes the service visible outside the Kubernetes cluster by the node’s IP address and the port number declared in this property. The service also has to be of type NodePort (if this field isn’t specified, Kubernetes will allocate a node port automatically).
+# ------------------------------------------------------------------------------------------------------------------------------------
+# |port| Expose the service on the specified port internally within the cluster. That is, the service becomes visible on this port, and will send requests made to this port to the pods selected by the service.
+# ------------------------------------------------------------------------------------------------------------------------------------
+# |targetPort| This is the port on the pod that the request gets sent to. Your application needs to be listening for network requests on this port for the service to work.
+# ------------------------------------------------------------------------------------------------------------------------------------
+
+spec:
+  # type: Make the service externally visible via the node
+  # type: NodePort
+  ports:
+  - port: 80
+    # targetPort: Which port do pods selected by this service expose?
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: http-svc
