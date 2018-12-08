@@ -319,6 +319,22 @@ debug-dashboard:
 # kubectl -n kube-system describe ds kubernetes-dashboard
 	 kubectl -n kube-system describe -f addon/dashboard/
 
+addon-ingress-nginx:
+	kubectl apply -f ./addon/ingress-nginx/mandatory.yaml
+	kubectl apply -f ./addon/ingress-nginx/service-nodeport.yaml
+
+debug-ingress-nginx:
+	kubectl --all-namespaces describe -f addon/ingress-nginx/
+
+watch-ingress-nginx:
+	kubectl get pods --all-namespaces -l app.kubernetes.io/name=ingress-nginx --watch
+
+# Detect installed version:
+# POD_NAME=$(kubectl get pods -l app.kubernetes.io/name=ingress-nginx -o jsonpath='{.items[0].metadata.name}')
+# kubectl exec -it $POD_NAME -- /nginx-ingress-controller --version
+
+#  helm install stable/nginx-ingress --name uck-nginx --namespace kube-system --set controller.hostNetwork=true,controller.kind=DaemonSet --set rbac.create=true
+
 # NOTE:
 # NOTE:
 # NOTE:
