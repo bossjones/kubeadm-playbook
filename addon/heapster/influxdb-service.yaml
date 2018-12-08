@@ -4,9 +4,14 @@ metadata:
   name: monitoring-influxdb
   namespace: kube-system
   labels:
+    # What happened to the cluster-service annotation? - https://github.com/kubernetes/dashboard/issues/1849
     kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
     kubernetes.io/name: "InfluxDB"
+    # Why do the yamls in this repo not feature the cluster-service tag that causes it to appear in kubectl cluster-info ?
+    # NOTE:
+    # dashboard is deployed after cluster creation -> annotation should not be set:
+    # kubernetes.io/cluster-service: "true"
 spec:
   ports:
     - name: http
@@ -16,4 +21,5 @@ spec:
       port: 8086
       targetPort: 8086
   selector:
+    # addonmanager.kubernetes.io/mode: Reconcile
     k8s-app: influxGrafana
