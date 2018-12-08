@@ -89,8 +89,10 @@ spec:
             timeoutSeconds: 5
           command:
             - /heapster
-            - --source=kubernetes.summary_api:''
+            - "--source=kubernetes.summary_api:''"
             - --sink=influxdb:http://monitoring-influxdb:8086
+          # - "/heapster"
+          # - "--source=kubernetes.summary_api:''"
         - image: k8s.gcr.io/heapster-amd64:v1.5.3
           name: eventer
           command:

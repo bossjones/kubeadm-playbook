@@ -291,6 +291,9 @@ describe-nginx-welcome:
 dump:
 	kubectl cluster-info dump --all-namespaces --output-directory=./dump
 
+dump2:
+	kubectl cluster-info dump --all-namespaces --output-directory=./dump2
+
 # https://github.com/kubernetes/dashboard/wiki/Access-control#bearer-token
 get-secrets:
 	kubectl -n kube-system get secret
