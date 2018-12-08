@@ -301,6 +301,9 @@ list-chart-versions-dashboard:
 addon-dashboard:
 	kubectl apply -f ./addon/dashboard/kubernetes-dashboard.yaml
 
+addon-weave-scope:
+	kubectl apply -f ./addon/weave-scope/scope-latest.yaml
+
 
 ####################################################
 ####### addon commands
