@@ -312,6 +312,13 @@ debug-weave-scope:
 	kubectl -n weave describe svc weave-scope
 	kubectl -n weave describe ds weave-scope-agent
 
+
+debug-dashboard:
+# kubectl -n kube-system describe deployment kubernetes-dashboard
+# kubectl -n kube-system describe svc kubernetes-dashboard
+# kubectl -n kube-system describe ds kubernetes-dashboard
+	 kubectl -n kube-system describe -f addon/dashboard/
+
 # NOTE:
 # NOTE:
 # NOTE:
