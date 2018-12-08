@@ -533,6 +533,7 @@
   - name: install ~/.cheat for root and default user
     shell: |
       git clone https://github.com/bossjones/boss-cheatsheets ~/.cheat
+      curl 'https://raw.githubusercontent.com/chrisallenlane/cheat/master/cheat/autocompletion/cheat.bash' > /etc/bash_completion.d/cheat ;
     become: '{{ item }}'
     args:
       executable: /bin/bash
