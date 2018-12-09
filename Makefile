@@ -456,3 +456,10 @@ delete-whoami:
 
 list-services:
 	kubectl get ingress,services -n=kube-system
+
+get-token:
+	bash ./scripts/get-root-token.sh
+
+get-bearer-token: get-token
+
+# dashboard url: http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login
