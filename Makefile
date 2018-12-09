@@ -611,3 +611,24 @@ watch-fluentd:
 delete-fluentd:
 	kubectl delete -f ./addon/efk2/fluentd-es-rc.yaml
 	kubectl delete -f ./addon/efk2/fluentd-es-configmap.yaml
+
+
+####################################################
+####### addon es-curator
+####################################################
+
+addon-es-curator:
+	kubectl apply -f ./addon/es-curator/es-curator-config.yaml
+	kubectl apply -f ./addon/es-curator/es-curator.yaml
+
+debug-es-curator:
+	kubectl describe -f ./addon/es-curator/es-curator-config.yaml
+	kubectl describe -f ./addon/es-curator/es-curator.yaml
+
+watch-es-curator:
+	kubectl get pods,services --all-namespaces -f ./addon/es-curator/es-curator-config.yaml
+	kubectl get pods,services --all-namespaces -f ./addon/es-curator/es-curator.yaml
+
+delete-es-curator:
+	kubectl delete -f ./addon/es-curator/es-curator-config.yaml
+	kubectl delete -f ./addon/es-curator/es-curator.yaml

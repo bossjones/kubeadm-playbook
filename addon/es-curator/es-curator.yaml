@@ -4,6 +4,8 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: curator
+  labels:
+    component: elasticsearch
 spec:
   schedule: 1 0 * * *
   jobTemplate:
