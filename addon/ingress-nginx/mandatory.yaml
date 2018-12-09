@@ -9,8 +9,8 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: nginx-configuration
-  namespace: kube-system
-  # namespace: ingress-nginx
+  # namespace: kube-system
+  namespace: ingress-nginx
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -20,8 +20,8 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: tcp-services
-  namespace: kube-system
-  # namespace: ingress-nginx
+  # namespace: kube-system
+  namespace: ingress-nginx
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -31,8 +31,8 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: udp-services
-  namespace: kube-system
-  # namespace: ingress-nginx
+  # namespace: kube-system
+  namespace: ingress-nginx
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -42,8 +42,8 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: nginx-ingress-serviceaccount
-  namespace: kube-system
-  # namespace: ingress-nginx
+  # namespace: kube-system
+  namespace: ingress-nginx
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -109,8 +109,8 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
   name: nginx-ingress-role
-  namespace: kube-system
-  # namespace: ingress-nginx
+  # namespace: kube-system
+  namespace: ingress-nginx
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -155,8 +155,8 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   name: nginx-ingress-role-nisa-binding
-  namespace: kube-system
-  # namespace: ingress-nginx
+  # namespace: kube-system
+  namespace: ingress-nginx
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
@@ -167,8 +167,8 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: nginx-ingress-serviceaccount
-    namespace: kube-system
-    # namespace: ingress-nginx
+    # namespace: kube-system
+    namespace: ingress-nginx
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -185,8 +185,8 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: nginx-ingress-serviceaccount
-    namespace: kube-system
-    # namespace: ingress-nginx
+    # namespace: kube-system
+    namespace: ingress-nginx
 
 ---
 
@@ -194,8 +194,8 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: nginx-ingress-controller
-  namespace: kube-system
-  # namespace: ingress-nginx
+  # namespace: kube-system
+  namespace: ingress-nginx
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
