@@ -10,4 +10,4 @@ vagrant-admin.conf
 
 debug_ansible/
 dump/
-dump2/
+dump*

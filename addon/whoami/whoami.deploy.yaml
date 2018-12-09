@@ -23,10 +23,10 @@ spec:
         image: containous/whoami
         resources:
           limits:
-            memory: 500Mi
+            memory: 55Mi
             cpu: 100m
           requests:
             cpu: 100m
-            memory: 200Mi
+            memory: 20Mi
         ports:
         - containerPort: 80
