@@ -18,16 +18,20 @@ metadata:
   name: default-http-backend
   namespace: kube-system
   labels:
+    # k8s-app: default-http-backend
+    # kubernetes.io/cluster-service: "true"
     app.kubernetes.io/name: default-http-backend
-    # app.kubernetes.io/part-of: kube-system
-    app.kubernetes.io/part-of: nginx-ingress
+    app.kubernetes.io/part-of: kube-system
+    # app.kubernetes.io/part-of: nginx-ingress
     # kubernetes.io/minikube-addons: ingress
     # kubernetes.io/minikube-addons-endpoint: ingress
+    # addonmanager.kubernetes.io/mode: Reconcile
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
   type: NodePort
   ports:
   - port: 80
+    # protocol: TCP
     targetPort: 8080
     # nodePort: The Service created in the last section already used NodePort, so your nginx HTTPS replica is ready to serve traffic on the internet if your node has a public IP.
     # curl https://<WORKER-NODE-IP>:<NODE-PORT> -k
@@ -42,4 +46,5 @@ spec:
     #   protocol: TCP
   selector:
     app.kubernetes.io/name: default-http-backend
-    app.kubernetes.io/part-of: nginx-ingress
+    # app.kubernetes.io/part-of: nginx-ingress
+    # k8s-app: default-http-backend
