@@ -11,6 +11,7 @@ DNSMASQ_DOMAIN         := bosslab.com
 # URL_PATH_TRAEFIK       := 80
 # URL_PATH_TRAEFIK_API   := 8080
 URL_PATH_WHOAMI        := "http://whoami.$(DNSMASQ_DOMAIN)"
+URL_PATH_DASHBOARD     := "http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login"
 
 .PHONY: list help
 
@@ -500,11 +501,11 @@ get-bearer-token: get-token
 # open-traefik:
 # 	./scripts/open-browser.py $(URL_PATH_TRAEFIK)
 
-# open-traefik-api:
-# 	./scripts/open-browser.py $(URL_PATH_TRAEFIK_API)
+open-dashboard:
+	./scripts/open-browser.py $(URL_PATH_DASHBOARD)
 
 open-whoami:
 	./scripts/open-browser.py $(URL_PATH_WHOAMI)
 
 # open: open-mongo-express open-flask-app open-uwsgi-stats open-locust-master open-consul open-traefik open-traefik-api open-whoami
-open: open-whoami
+open: open-whoami open-dashboard
