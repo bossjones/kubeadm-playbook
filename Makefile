@@ -401,6 +401,27 @@ test-http-svc:
 delete-http-svc:
 	kubectl delete -f ./addon/http-svc
 
+
+####################################################
+####### addon whoami
+####################################################
+
+addon-whoami:
+	kubectl apply -f ./addon/whoami
+
+debug-whoami:
+	@echo
+	kubectl describe -f ./addon/whoami/
+	@echo
+	kubectl get svc whoami
+	@echo
+
+test-whoami:
+	@bash ./scripts/curl-whoami.sh
+
+delete-whoami:
+	kubectl delete -f ./addon/whoami
+
 ####################################################
 ####### addon commands
 ####################################################
