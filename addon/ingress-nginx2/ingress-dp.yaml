@@ -19,7 +19,8 @@ metadata:
   namespace: kube-system
   labels:
     app.kubernetes.io/name: default-http-backend
-    app.kubernetes.io/part-of: kube-system
+    # app.kubernetes.io/part-of: kube-system
+    app.kubernetes.io/part-of: nginx-ingress
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
   replicas: 1
@@ -28,6 +29,11 @@ spec:
       app.kubernetes.io/name: default-http-backend
       addonmanager.kubernetes.io/mode: Reconcile
   template:
+    # SOURCE: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+    # SOURCE: https://kubernetes.io/docs/concepts/workloads/pods/pod/
+    # NOTE: For kind=Deploymentthe, .spec.template is a pod template.
+    # it has exactly the same schema as a Pod except it
+    # is nested and does not have an apiVersion
     metadata:
       labels:
         app.kubernetes.io/name: default-http-backend
@@ -65,20 +71,23 @@ metadata:
   namespace: kube-system
   labels:
     app.kubernetes.io/name: nginx-ingress-controller
-    app.kubernetes.io/part-of: kube-system
+    # app.kubernetes.io/part-of: kube-system
+    app.kubernetes.io/part-of: nginx-ingress
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: nginx-ingress-controller
-      app.kubernetes.io/part-of: kube-system
+      # app.kubernetes.io/part-of: kube-system
+      app.kubernetes.io/part-of: nginx-ingress
       addonmanager.kubernetes.io/mode: Reconcile
   template:
     metadata:
       labels:
         app.kubernetes.io/name: nginx-ingress-controller
-        app.kubernetes.io/part-of: kube-system
+        # app.kubernetes.io/part-of: kube-system
+        app.kubernetes.io/part-of: nginx-ingress
         addonmanager.kubernetes.io/mode: Reconcile
       annotations:
         prometheus.io/port: '10254'

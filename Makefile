@@ -453,3 +453,6 @@ delete-whoami:
 # nginx-welcome   1               Thu Dec  6 23:01:12 2018        DEPLOYED        nginx-welcome-0.1.0             1.0             default
 # prometheus      1               Wed Dec  5 23:42:51 2018        DEPLOYED        prometheus-operator-0.1.29      0.25.0          monitoring
 # weave-scope     1               Thu Dec  6 00:57:55 2018        DEPLOYED        weave-scope-0.10.0              1.9.1           default
+
+list-services:
+	kubectl get ingress,services -n=kube-system
