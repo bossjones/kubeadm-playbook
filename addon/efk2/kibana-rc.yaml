@@ -35,18 +35,18 @@ spec:
       containers:
       - name: kibana-logging
         image: docker.elastic.co/kibana/kibana:5.6.2
-        # resources:
-        #   limits:
-        #     cpu: 500m
-        #   requests:
-        #     cpu: 100m
         resources:
-            limits:
-              cpu: 100m
-              memory: 128Mi
-            requests:
-              cpu: 100m
-              memory: 128Mi
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 100m
+        # resources:
+        #     limits:
+        #       cpu: 100m
+        #       memory: 128Mi
+        #     requests:
+        #       cpu: 100m
+        #       memory: 128Mi
         env:
           - name: ELASTICSEARCH_URL
             value: http://elasticsearch-logging:9200
