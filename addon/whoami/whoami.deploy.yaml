@@ -7,7 +7,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: whoami
-  namespace: kube-system
+  # namespace: kube-system
 spec:
   replicas: 1
   selector:
