@@ -589,3 +589,25 @@ delete-kibana:
 	kubectl delete -f ./addon/efk2/kibana-rc.yaml
 	kubectl delete -f ./addon/efk2/kibana-svc.yaml
 	kubectl delete -f ./addon/efk2/kibana-ingress.yaml
+
+
+####################################################
+####### addon fluentd
+####################################################
+
+addon-fluentd:
+# kubectl apply -f ./addon/efk2/fluentd*
+	kubectl apply -f ./addon/efk2/fluentd-es-rc.yaml
+	kubectl apply -f ./addon/efk2/fluentd-es-configmap.yaml
+
+debug-fluentd:
+	kubectl describe -f ./addon/efk2/fluentd-es-rc.yaml
+	kubectl describe -f ./addon/efk2/fluentd-es-configmap.yaml
+
+watch-fluentd:
+	kubectl get pods,services --all-namespaces -f ./addon/efk2/fluentd-es-rc.yaml
+	kubectl get pods,services --all-namespaces -f ./addon/efk2/fluentd-es-configmap.yaml
+
+delete-fluentd:
+	kubectl delete -f ./addon/efk2/fluentd-es-rc.yaml
+	kubectl delete -f ./addon/efk2/fluentd-es-configmap.yaml
