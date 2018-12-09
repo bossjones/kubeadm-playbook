@@ -1,3 +1,17 @@
+# SOURCE: https://github.com/autopilotpattern/jenkins/blob/master/makefile
+MAKEFLAGS += --warn-undefined-variables
+# .SHELLFLAGS := -eu -o pipefail
+
+DNSMASQ_DOMAIN         := bosslab.com
+# URL_PATH_MONGO_EXPRESS := 8081
+# URL_PATH_FLASK_APP     := 8888
+# URL_PATH_UWSGI_STATS   := 9191
+# URL_PATH_LOCUST_MASTER := 8089
+# URL_PATH_CONSUL        := 8500
+# URL_PATH_TRAEFIK       := 80
+# URL_PATH_TRAEFIK_API   := 8080
+URL_PATH_WHOAMI        := "http://whoami.$(DNSMASQ_DOMAIN)"
+
 .PHONY: list help
 
 PR_SHA                := $(shell git rev-parse HEAD)
@@ -463,3 +477,34 @@ get-token:
 get-bearer-token: get-token
 
 # dashboard url: http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login
+
+
+# -------------------------
+
+
+# open-mongo-express:
+# 	./scripts/open-browser.py $(URL_PATH_MONGO_EXPRESS)
+
+# open-flask-app:
+# 	./scripts/open-browser.py $(URL_PATH_FLASK_APP)
+
+# open-uwsgi-stats:
+# 	./scripts/open-browser.py $(URL_PATH_UWSGI_STATS)
+
+# open-locust-master:
+# 	./scripts/open-browser.py $(URL_PATH_LOCUST_MASTER)
+
+# open-consul:
+# 	./scripts/open-browser.py $(URL_PATH_CONSUL)
+
+# open-traefik:
+# 	./scripts/open-browser.py $(URL_PATH_TRAEFIK)
+
+# open-traefik-api:
+# 	./scripts/open-browser.py $(URL_PATH_TRAEFIK_API)
+
+open-whoami:
+	./scripts/open-browser.py $(URL_PATH_WHOAMI)
+
+# open: open-mongo-express open-flask-app open-uwsgi-stats open-locust-master open-consul open-traefik open-traefik-api open-whoami
+open: open-whoami
