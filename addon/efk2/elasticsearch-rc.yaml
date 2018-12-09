@@ -49,6 +49,11 @@ spec:
         - containerPort: 9300
           name: transport
           protocol: TCP
+        # livenessProbe:
+        #   tcpSocket:
+        #     port: transport
+        #   initialDelaySeconds: 20
+        #   periodSeconds: 10
         volumeMounts:
         - name: elasticsearch-logging
           mountPath: /data
@@ -59,8 +64,31 @@ spec:
               fieldPath: metadata.namespace
         - name: MINIMUM_MASTER_NODES
           value: "1"
+
+        # - name: NODE_NAME
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: metadata.name
+        # - name: CLUSTER_NAME
+        #   value: myesdb
+        # - name: NUMBER_OF_MASTERS
+        #   value: "2"
+        # - name: NODE_MASTER
+        #   value: "true"
+        # - name: NODE_INGEST
+        #   value: "false"
+        # - name: NODE_DATA
+        #   value: "false"
+        # - name: HTTP_ENABLE
+        #   value: "false"
+        # - name: PROCESSORS
+        #   valueFrom:
+        #     resourceFieldRef:
+        #       resource: limits.cpu
+
         - name: ES_JAVA_OPTS
-          value: "-Xms1024m -Xmx1024m"
+          # value: "-Xms1024m -Xmx1024m"
+          value: "-Xms256m -Xmx256m"
       initContainers:
       - image: registry.hub.docker.com/library/alpine:3.6
         command: ["/sbin/sysctl", "-w", "vm.max_map_count=262144"]
@@ -70,3 +98,9 @@ spec:
       volumes:
       - name: elasticsearch-logging
         emptyDir: {}
+
+      # SOURCE: https://github.com/pires/kubernetes-elasticsearch-cluster/blob/master/es-master.yaml
+      # volumes:
+      #   - emptyDir:
+      #       medium: ""
+      #     name: "storage"

@@ -40,13 +40,12 @@ spec:
             cpu: 500m
           requests:
             cpu: 100m
+        # SOURCE: https://github.com/pires/kubernetes-elasticsearch-cluster/blob/master/kibana.yaml
         # resources:
-        #     limits:
-        #       cpu: 100m
-        #       memory: 128Mi
-        #     requests:
-        #       cpu: 100m
-        #       memory: 128Mi
+        #   limits:
+        #     cpu: 1000m
+        #   requests:
+        #     cpu: 100m
         env:
           - name: ELASTICSEARCH_URL
             value: http://elasticsearch-logging:9200
