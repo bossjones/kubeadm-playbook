@@ -1,0 +1,17 @@
+# https://medium.com/@awkwardferny/getting-started-with-kubernetes-ingress-nginx-on-minikube-d75e58f52b6c
+
+# USAGE: kubectl apply -f echoserver.svc.yaml
+# wait a min for the service to be created
+# kubectl get svc
+apiVersion: v1
+kind: Service
+metadata:
+  name: meow-svc
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: meow
