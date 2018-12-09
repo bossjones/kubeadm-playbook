@@ -13,7 +13,7 @@ DNSMASQ_DOMAIN         := bosslab.com
 URL_PATH_WHOAMI        := "http://whoami.$(DNSMASQ_DOMAIN)"
 URL_PATH_ELASTICSEARCH := "http://elasticsearch.$(DNSMASQ_DOMAIN)"
 URL_PATH_KIBANA        := "http://kibana.$(DNSMASQ_DOMAIN)"
-URL_PATH_DASHBOARD     := "http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login"
+URL_PATH_DASHBOARD     := "http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/"
 
 .PHONY: list help
 
