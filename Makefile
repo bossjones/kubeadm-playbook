@@ -11,6 +11,7 @@ DNSMASQ_DOMAIN         := bosslab.com
 # URL_PATH_TRAEFIK       := 80
 # URL_PATH_TRAEFIK_API   := 8080
 URL_PATH_WHOAMI        := "http://whoami.$(DNSMASQ_DOMAIN)"
+URL_PATH_ELASTICSEARCH        := "http://elasticsearch.$(DNSMASQ_DOMAIN)"
 URL_PATH_DASHBOARD     := "http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login"
 
 .PHONY: list help
@@ -507,5 +508,80 @@ open-dashboard:
 open-whoami:
 	./scripts/open-browser.py $(URL_PATH_WHOAMI)
 
+open-elasticsearch:
+	./scripts/open-browser.py $(URL_PATH_ELASTICSEARCH)
+
 # open: open-mongo-express open-flask-app open-uwsgi-stats open-locust-master open-consul open-traefik open-traefik-api open-whoami
 open: open-whoami open-dashboard
+
+
+
+
+
+
+####################################################
+####### addon efk
+####################################################
+
+addon-efk:
+	kubectl apply -f ./addon/efk2
+
+debug-efk:
+	kubectl describe -f ./addon/efk2/
+
+watch-efk:
+	kubectl get pods,services --all-namespaces -f ./addon/efk2/
+
+delete-efk:
+	kubectl delete -f ./addon/efk2
+
+
+####################################################
+####### addon elasticsearch
+####################################################
+
+addon-elasticsearch:
+# kubectl apply -f ./addon/efk2/elasticsearch*
+	kubectl apply -f ./addon/efk2/elasticsearch-rc.yaml
+	kubectl apply -f ./addon/efk2/elasticsearch-svc.yaml
+	kubectl apply -f ./addon/efk2/elasticsearch-ingress.yaml
+
+debug-elasticsearch:
+	kubectl describe -f ./addon/efk2/elasticsearch-rc.yaml
+	kubectl describe -f ./addon/efk2/elasticsearch-svc.yaml
+	kubectl describe -f ./addon/efk2/elasticsearch-ingress.yaml
+
+watch-elasticsearch:
+	kubectl get pods,services --all-namespaces -f ./addon/efk2/elasticsearch-rc.yaml
+	kubectl get pods,services --all-namespaces -f ./addon/efk2/elasticsearch-svc.yaml
+	kubectl get pods,services --all-namespaces -f ./addon/efk2/elasticsearch-ingress.yaml
+
+delete-elasticsearch:
+	kubectl delete -f ./addon/efk2/elasticsearch-rc.yaml
+	kubectl delete -f ./addon/efk2/elasticsearch-svc.yaml
+	kubectl delete -f ./addon/efk2/elasticsearch-ingress.yaml
+
+####################################################
+####### addon kibana
+####################################################
+
+addon-kibana:
+# kubectl apply -f ./addon/efk2/kibana*
+	kubectl apply -f ./addon/efk2/kibana-rc.yaml
+	kubectl apply -f ./addon/efk2/kibana-svc.yaml
+	kubectl apply -f ./addon/efk2/kibana-ingress.yaml
+
+debug-kibana:
+	kubectl describe -f ./addon/efk2/kibana-rc.yaml
+	kubectl describe -f ./addon/efk2/kibana-svc.yaml
+	kubectl describe -f ./addon/efk2/kibana-ingress.yaml
+
+watch-kibana:
+	kubectl get pods,services --all-namespaces -f ./addon/efk2/kibana-rc.yaml
+	kubectl get pods,services --all-namespaces -f ./addon/efk2/kibana-svc.yaml
+	kubectl get pods,services --all-namespaces -f ./addon/efk2/kibana-ingress.yaml
+
+delete-kibana:
+	kubectl delete -f ./addon/efk2/kibana-rc.yaml
+	kubectl delete -f ./addon/efk2/kibana-svc.yaml
+	kubectl delete -f ./addon/efk2/kibana-ingress.yaml
