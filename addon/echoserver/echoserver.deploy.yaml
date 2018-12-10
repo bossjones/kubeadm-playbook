@@ -6,19 +6,31 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: meow
+  name: echoserver
+  namespace: echoserver
+  labels:
+    run: nginx
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: meow
+      # app: echoserver
+      run: nginx
   template:
     metadata:
       labels:
-        app: meow
+        # app: echoserver
+        run: nginx
     spec:
       containers:
-      - name: meow
+      - name: echoserver
         image: gcr.io/kubernetes-e2e-test-images/echoserver:2.1
+        resources:
+          limits:
+            memory: 55Mi
+            cpu: 100m
+          requests:
+            cpu: 100m
+            memory: 20Mi
         ports:
         - containerPort: 8080

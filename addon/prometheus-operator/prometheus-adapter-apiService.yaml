@@ -9,5 +9,6 @@ spec:
   service:
     name: prometheus-adapter
     # namespace: monitoring
+    namespace: default
   version: v1beta1
   versionPriority: 100

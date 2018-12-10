@@ -1,14 +1,5 @@
 # https://medium.com/@awkwardferny/getting-started-with-kubernetes-ingress-nginx-on-minikube-d75e58f52b6c
 
-# USAGE: kubectl apply -f echoserver.svc.yaml
-# wait a min for the service to be created
-# kubectl get svc
-
-# wait a min for the ingress resource to be created
-# $ kubectl get ing
-# NAME           HOSTS     ADDRESS     PORTS
-# zeke-ingress   *         10.0.2.15   80
-
 # https://kubernetes.io/docs/concepts/services-networking/ingress/
 # https://kubernetes.io/docs/reference/federation/extensions/v1beta1/definitions/
 # https://medium.com/@cashisclay/kubernetes-ingress-82aa960f658e

@@ -11,6 +11,7 @@ DNSMASQ_DOMAIN         := bosslab.com
 # URL_PATH_TRAEFIK       := 80
 # URL_PATH_TRAEFIK_API   := 8080
 URL_PATH_WHOAMI            := "http://whoami.$(DNSMASQ_DOMAIN)"
+URL_PATH_ECHOSERVER        := "http://echoserver.$(DNSMASQ_DOMAIN)"
 URL_PATH_ELASTICSEARCH     := "http://elasticsearch.$(DNSMASQ_DOMAIN)"
 URL_PATH_KIBANA            := "http://kibana.$(DNSMASQ_DOMAIN)"
 URL_PATH_PROMETHEUS        := "http://prometheus.$(DNSMASQ_DOMAIN)"
@@ -540,6 +541,9 @@ open-dashboard:
 open-whoami:
 	./scripts/open-browser.py $(URL_PATH_WHOAMI)
 
+open-echoserver:
+	./scripts/open-browser.py $(URL_PATH_ECHOSERVER)
+
 open-elasticsearch:
 	./scripts/open-browser.py $(URL_PATH_ELASTICSEARCH)
 
@@ -672,3 +676,25 @@ watch-es-curator:
 delete-es-curator:
 	kubectl delete -f ./addon/es-curator/es-curator-config.yaml
 	kubectl delete -f ./addon/es-curator/es-curator.yaml
+
+
+
+####################################################
+####### addon echoserver
+####################################################
+
+addon-echoserver:
+	kubectl apply -f ./addon/echoserver/
+
+debug-echoserver:
+	@echo
+	kubectl describe -f ./addon/echoserver/
+	@echo
+	kubectl get svc echoserver
+	@echo
+
+test-echoserver:
+	@bash ./scripts/curl-echoserver.sh
+
+delete-echoserver:
+	kubectl delete -f ./addon/echoserver
