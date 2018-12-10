@@ -204,6 +204,9 @@ bridge-restart:
 bridge-start:
 	./vagrant_bridged_demo.sh --start
 
+bridge-halt:
+	vagrant halt
+
 ssh-bridge-master:
 	ssh -F ./ssh_config boss-master-01.scarlettlab.home
 
@@ -475,7 +478,10 @@ list-services:
 	kubectl get ingress,services -n=kube-system
 
 get-token:
-	bash ./scripts/get-root-token.sh
+	@bash ./scripts/get-root-token.sh
+
+get-token-copy:
+	@bash ./scripts/get-root-token.sh | pbcopy
 
 get-bearer-token: get-token
 
@@ -484,6 +490,28 @@ get-bearer-token: get-token
 
 # -------------------------
 
+
+####################################################
+####### addon prometheus-operator
+####################################################
+
+# SOURCE: https://github.com/coreos/prometheus-operator/tree/7f34279e7c69124a80248cc54cadef93fd1b2387/contrib/kube-prometheus
+addon-prometheus-operator:
+	kubectl create -f ./addon/prometheus-operator/ || true
+	@echo
+	@echo "It can take a few seconds for the above 'create manifests' command to fully create the following resources, so verify the resources are ready before proceeding."
+	until kubectl get customresourcedefinitions servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo ""; done
+	@echo
+	until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
+	@echo
+
+
+debug-prometheus-operator:
+	@echo
+	kubectl describe -f ./addon/prometheus-operator/
+
+delete-prometheus-operator:
+	kubectl delete -f ./addon/prometheus-operator || true
 
 # open-mongo-express:
 # 	./scripts/open-browser.py $(URL_PATH_MONGO_EXPRESS)
