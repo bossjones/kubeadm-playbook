@@ -10,10 +10,13 @@ DNSMASQ_DOMAIN         := bosslab.com
 # URL_PATH_CONSUL        := 8500
 # URL_PATH_TRAEFIK       := 80
 # URL_PATH_TRAEFIK_API   := 8080
-URL_PATH_WHOAMI        := "http://whoami.$(DNSMASQ_DOMAIN)"
-URL_PATH_ELASTICSEARCH := "http://elasticsearch.$(DNSMASQ_DOMAIN)"
-URL_PATH_KIBANA        := "http://kibana.$(DNSMASQ_DOMAIN)"
-URL_PATH_DASHBOARD     := "http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/"
+URL_PATH_WHOAMI            := "http://whoami.$(DNSMASQ_DOMAIN)"
+URL_PATH_ELASTICSEARCH     := "http://elasticsearch.$(DNSMASQ_DOMAIN)"
+URL_PATH_KIBANA            := "http://kibana.$(DNSMASQ_DOMAIN)"
+URL_PATH_PROMETHEUS        := "http://prometheus.$(DNSMASQ_DOMAIN)"
+URL_PATH_GRAFANA           := "http://grafana.$(DNSMASQ_DOMAIN)"
+URL_PATH_ALERTMANAGER      := "http://alertmanager.$(DNSMASQ_DOMAIN)"
+URL_PATH_DASHBOARD         := "http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/"
 
 .PHONY: list help
 
@@ -542,6 +545,15 @@ open-elasticsearch:
 
 open-kibana:
 	./scripts/open-browser.py $(URL_PATH_KIBANA)
+
+open-prometheus:
+	./scripts/open-browser.py $(URL_PATH_PROMETHEUS)
+
+open-grafana:
+	./scripts/open-browser.py $(URL_PATH_GRAFANA)
+
+open-alertmanager:
+	./scripts/open-browser.py $(URL_PATH_ALERTMANAGER)
 
 # open: open-mongo-express open-flask-app open-uwsgi-stats open-locust-master open-consul open-traefik open-traefik-api open-whoami
 open: open-whoami open-dashboard
