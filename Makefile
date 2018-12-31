@@ -484,6 +484,12 @@ list-services:
 get-token:
 	@bash ./scripts/get-root-token.sh
 
+
+kube-proxy:
+	@bash ./scripts/kubectl-proxy.sh
+
+kubectl-proxy: kube-proxy
+
 get-token-copy:
 	@bash ./scripts/get-root-token.sh | pbcopy
 
