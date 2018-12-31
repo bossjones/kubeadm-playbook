@@ -209,7 +209,7 @@ bridge-start:
 	./vagrant_bridged_demo.sh --start
 
 bridge-halt:
-	vagrant halt
+	@vagrant halt -f
 
 ssh-bridge-master:
 	ssh -F ./ssh_config boss-master-01.scarlettlab.home
